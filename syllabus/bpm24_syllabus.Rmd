@@ -10,18 +10,20 @@ output: pdf_document
 
 ## Course Information
 
-|                                     | _                                     |
-|-------------------------------------|------------------------------------:|
+|                                     |                                      |
+|-------------------------------------|------------------------------------|
 |Instructor:                          |                     Jonathan Templin|
 |email:                               |           jonathan-templin@uiowa.edu|
-|Course website:                      | [https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/](https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024    |
+|Course website:                      | [https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/](https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024)    |
 |Office:                              |               S300A Lindquist Center|
 |Office Phone: | 319-335-6429 |
 |Classroom:                           |                Zoom Only at [https://uiowa.zoom.us/j/91009790282?pwd=K4T1Da6Nb9iTl1Vfaox1Mki3tq0GUl.1](https://uiowa.zoom.us/j/91009790282?pwd=K4T1Da6Nb9iTl1Vfaox1Mki3tq0GUl.1)|
 |Course Meeting Time:                 |               T & Th 9:30am-10:45am|
-|Course Office Hours:                 |   W 9:30am-11:30am via Zoom at
-[https://uiowa.zoom.us/my/jonathantemplinuiowa](https://uiowa.zoom.us/my/jonathantemplinuiowa)|
-|-------------------------------------|------------------------------------:|
+|Course Office Hours:                 |   W 9:30am-11:30am via Zoom at [https://uiowa.zoom.us/my/jonathantemplinuiowa](https://uiowa.zoom.us/my/jonathantemplinuiowa) |
+
+
+|                                     |                                      |
+|-------------------------------------|------------------------------------|
 |Teaching Assistant: | Bladimir Padilla |
 |Teaching Assistant email: | geraldo-padilla@uiowa.edu |
 |Teaching Assistant Office Hours: | TBD |
