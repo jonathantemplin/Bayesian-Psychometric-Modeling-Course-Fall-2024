@@ -207,7 +207,10 @@ FullModel = lm(formula = WeightLB ~ 1, data = DietData)
 ## Path Diagram of Our Model
 
 ```{r regPM, echo=FALSE}
-if (!require(pathdiagram)) install.packages("pathdiagram")
+if (!require(devtools)) install.packages("devtools")
+library(devtools)
+
+if (!require(pathdiagram)) install_github("https://github.com/gastonstat/pathdiagram")
 wall(ylim=c(.2,1))
 
 weightLB = manifest("WeightLB", x = .8, y = .5)
