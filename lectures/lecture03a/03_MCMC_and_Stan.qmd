@@ -104,7 +104,7 @@ Bayesian analysis is all about estimating the posterior distribution
 
 - Despite having fairly broad differences regarding how algorithms sample from the posterior distribution, there are quite a few things that are similar across algorithms:
     1. A period of the Markov chain where sampling is not directly from the posterior
-        - The burnin period (sometimes coupled with other tuning periods and called warmuup)
+        - The burnin period (sometimes coupled with other tuning periods and called warmup)
     2. Methods used to assess convergence of the chain to the posterior distribution
         - Often involving the need to use multiple chains with independent and differing starting values
     3. Summaries of the posterior distribution
@@ -263,7 +263,7 @@ Questions:
 :::{.incremental}
 - Stan is an MCMC estimation program
   - Most recent; has many convenient features
-  - Actually does severaly methods of estimation (ML, Variational Bayes)
+  - Actually does several methods of estimation (ML, Variational Bayes)
 - You create a model using Stan's syntax
   - Stan translates your model to a custom-built C++ syntax
   - Stan then compiles your model into its own executable program
@@ -510,13 +510,13 @@ model00.rstan = stan(
 - Once Stan stops, the next step is to determine if the chains converged to their posterior distribution
   - Called convergence diagnosis
 - Many methods have been developed for diagnosing if Markov chains have converged
-  - Two most common: visual in spection and Gelman-Rubin Potential Scale Reduction Factor (PSRF; [quick reference](https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_introbayes_sect008.htm#statug.introbayes.bayesgelman))
+  - Two most common: visual inspection and Gelman-Rubin Potential Scale Reduction Factor (PSRF; [quick reference](https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_introbayes_sect008.htm#statug.introbayes.bayesgelman))
   
 ## Examining Chain Convergence
   
   
 - Visual inspection
-  - Want no trends in timeseries -- should look like a catapillar
+  - Want no trends in timeseries -- should look like a caterpillar
   - Shape of posterior density should be mostly smooth
 - Gelman-Rubin PSRF (denoted with $\hat{R}$)
   - For analyses with multiple chains

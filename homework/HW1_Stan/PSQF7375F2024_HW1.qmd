@@ -60,6 +60,48 @@ This question ensures you have access. To complete this question, please do the 
 
 1. Go to [https://notebooks.hpc.uiowa.edu](https://notebooks.hpc.uiowa.edu) and find our course site
 2. Log in using your HawkID and password
-3. Once you get past the two-factor authentication, please take a screen shot of the screen
+3. Once you get past the two-factor authentication, install the following:
+
+
+* rstan (stan and the rstan R package); see [https://mc-stan.org/users/interfaces/rstan.html](https://mc-stan.org/users/interfaces/rstan.html)
+* cmdstan r; see [https://mc-stan.org/cmdstanr/](https://mc-stan.org/cmdstanr/)
+
+Once complete, please run the put the following syntax into an R file and run it on your local machine:
+```{r stancode2, echo=TRUE, eval=FALSE}
+# we recommend running this is a fresh R session or restarting your current session
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+
+library(cmdstanr)
+check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
+library(posterior)
+library(bayesplot)
+color_scheme_set("brightblue")
+
+check_cmdstan_toolchain()
+install_cmdstan(cores = 2)
+set_cmdstan_path()
+cmdstan_version()
+cmdstan_path()
+
+file <- file.path(cmdstan_path(), "examples", "bernoulli", "bernoulli.stan")
+mod <- cmdstan_model(file)
+mod$print()
+
+# names correspond to the data block in the Stan program
+data_list <- list(N = 10, y = c(0,1,0,0,0,0,0,0,0,1))
+
+fit <- mod$sample(
+  data = data_list, 
+  seed = 123, 
+  chains = 4, 
+  parallel_chains = 4,
+  refresh = 500 # print update every 500 iters
+)
+
+fit$summary()
+mcmc_hist(fit$draws("theta"))
+```
+
+Please take a screen shot and upload that as part of your homework results.
 
 
