@@ -55,10 +55,20 @@ library(ggplot2)
 ```
 
 ## The Markov Chain Timeseries
-![](posteriorPlot01.png)
+
+```{r timeseries1, echo=FALSE}
+
+mcmc_trace(model00.samples$draws(c("beta0", "sigma")))
+
+```
 
 ## The Posterior Distribution 
-![](posteriorPlot02.png)
+
+```{r posterior1, echo=FALSE}
+
+mcmc_dens(model00.samples$draws(c("beta0", "sigma")))
+
+```
 
 ## Markov Chain Monte Carlo Estimation
 
@@ -608,7 +618,12 @@ hdi(model00.samples$draws("sigma"), credMass = .9)
 ```
 
 ## The Posterior Distribution 
-![](posteriorPlot02.png)
+
+```{r posterior2, echo=FALSE}
+
+mcmc_dens(model00.samples$draws(c("beta0", "sigma")))
+
+```
 
 
 ## Wrapping Up
