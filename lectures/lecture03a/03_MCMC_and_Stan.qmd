@@ -4,7 +4,7 @@ author: "Lecture 3"
 format: 
   revealjs:
     multiplex: true
-    footer: "[https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/](https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/)"
+    footer: "[https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2022/](https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2022/)"
     theme: ["pp.scss"]
     slide-number: c/t
     incremental: true
@@ -21,15 +21,7 @@ editor: source
 
 ```{r, include=FALSE}
 options(tinytex.verbose = TRUE)
-# checks if data have been stored and if not, runs data
-if (length(grep(dir(), pattern = "lecture03.RData")) == 0){
-  source("03_MCMC_and_Stan.R")
-}
-
-model00.samples = readRDS("model00_samples.RDS")
 load("lecture03.RData")
-
-
 ```
 
 ```{r InstallLoadPackages, echo=FALSE, include=FALSE}
@@ -55,19 +47,14 @@ library(ggplot2)
 ```
 
 ## The Markov Chain Timeseries
-
-```{r timeseries1, echo=FALSE}
-
+```{r}
 mcmc_trace(model00.samples$draws(c("beta0", "sigma")))
-
 ```
 
+
 ## The Posterior Distribution 
-
-```{r posterior1, echo=FALSE}
-
+```{r}
 mcmc_dens(model00.samples$draws(c("beta0", "sigma")))
-
 ```
 
 ## Markov Chain Monte Carlo Estimation
@@ -80,13 +67,9 @@ Bayesian analysis is all about estimating the posterior distribution
         - Conjugate prior: the family of the prior is equivalent to the family of the posterior
 - Most of the time, however, posterior distributions are not easily obtainable
     - No longer able to use properties of the distribution to estimate parameters
-
-## Markov Chain Monte Carlo Estimation
-
 - It is possible to use an optimization algorithm (e.g., Newton-Raphson or Expectation-Maximization) to find maximum value of posterior distribution
     - But, such algorithms may take a very long time for high-dimensional problems
-- Variational Bayesian methods also attempt to approximate the center of the posterior distribution (and are faster than optimization algorithms for large models)
-- Instead: MCMC "sketches" the posterior by sampling from it -- then use that sketch to make inferences
+- Instead: "sketch" the posterior by sampling from it -- then use that sketch to make inferences
     - Sampling is done via MCMC
     
 ## Markov Chain Monte Carlo Estimation
@@ -114,13 +97,10 @@ Bayesian analysis is all about estimating the posterior distribution
 
 - Despite having fairly broad differences regarding how algorithms sample from the posterior distribution, there are quite a few things that are similar across algorithms:
     1. A period of the Markov chain where sampling is not directly from the posterior
-        - The burnin period (sometimes coupled with other tuning periods and called warmup)
+        - The burnin period (sometimes coupled with other tuning periods and called warmuup)
     2. Methods used to assess convergence of the chain to the posterior distribution
         - Often involving the need to use multiple chains with independent and differing starting values
     3. Summaries of the posterior distribution
-
-## Commonalities Across MCMC Algorithms
-
 - Further, rejection-based sampling algorithms often need a tuning period to make the sampling more efficient
     - The tuning period comes before the algorithm begins its burnin period
 
@@ -133,7 +113,7 @@ Bayesian analysis is all about estimating the posterior distribution
 
 ## Example Data: Post-Diet Weights
 
-[Example Data Link](https://stats.idre.ucla.edu/spss/library/spss-libraryhow-do-i-handle-interactions-of-continuous-andcategorical-variables/) 
+Example Data: [https://stats.idre.ucla.edu/spss/library/spss-libraryhow-do-i-handle-interactions-of-continuous-andcategorical-variables/](https://stats.idre.ucla.edu/spss/library/spss-libraryhow-do-i-handle-interactions-of-continuous-andcategorical-variables/) 
 
 - The file DietData.csv contains data from 30 respondents who participated in a study regarding the effectiveness of three types of diets.
 - Variables in the data set are:
@@ -217,10 +197,7 @@ FullModel = lm(formula = WeightLB ~ 1, data = DietData)
 ## Path Diagram of Our Model
 
 ```{r regPM, echo=FALSE}
-if (!require(devtools)) install.packages("devtools")
-library(devtools)
-
-if (!require(pathdiagram)) install_github("https://github.com/gastonstat/pathdiagram")
+if (!require(pathdiagram)) install.packages("pathdiagram")
 wall(ylim=c(.2,1))
 
 weightLB = manifest("WeightLB", x = .8, y = .5)
@@ -273,7 +250,7 @@ Questions:
 :::{.incremental}
 - Stan is an MCMC estimation program
   - Most recent; has many convenient features
-  - Actually does several methods of estimation (ML, Variational Bayes)
+  - Actually does severaly methods of estimation (ML, Variational Bayes)
 - You create a model using Stan's syntax
   - Stan translates your model to a custom-built C++ syntax
   - Stan then compiles your model into its own executable program
@@ -326,42 +303,17 @@ model {
 
 ```
 
+
 :::{.nonincremental}
 - Above is the syntax for our model
   - Each line ends with a semi colon
   - Comments are put in with //
-:::
-
-
-## Stan Syntax: R Character Object
-
-```{r firstSyntaxR, eval=TRUE, echo=TRUE}
-stanModel = "
-data {
-  int<lower=0> N;
-  vector[N] y;
-}
-
-parameters {
-  real beta0;
-  real<lower=0> sigma;
-}
-
-model {
-  beta0 ~ normal(0, 1000); // prior for beta0
-  sigma ~ uniform(0, 100000); // prior for sigma
-  y ~ normal(beta0, sigma); // model for observed data
-}
-"
-```
-
-:::{.nonincremental}
+  
 - Three blocks of syntax needed
   - Data: What Stan expects you will send to it for the analysis (using R lists)
   - Parameters: Where you specify what the parameters of the model are
   - Model: Where you specify the distributions of the priors and data
 :::
-
 
 ## Stan Data and Parameter Delcaration
 
@@ -453,7 +405,7 @@ model00.samples = model00.fromFile$sample(
 ```
 
 :::{.nonincremental}
-- The next step is to run the Markov Chain (sample from the posterior distribution)
+- With the compiled program and the data, the next step is to run the Markov Chain (a process sometimes called sampling as you are sampling from a posterior distribution)
 - In ```cmdstanr```, running the chain comes from the ```$sample()``` function that is a part of the compiled program object
 - You must specify:
   - The data 
@@ -492,47 +444,46 @@ model00.rstan = stan(
 
 ## MCMC Process
 
-
+:::{.nonincremental}
 - The MCMC algorithm runs as a series of discrete iterations
   - Within each iteration, each parameter of a model has an opportunity to change its value
 - For each parameter, a new parameter is sampled at random from the current belief of posterior distribution
   - The specifics of the sampling process differ by algorithm type (we'll have a lecture on this later)
-
-
-
-## MCMC Process
-
 - In Stan (Hamiltonian Monte Carlo), for a given iteration, a proposed parameter is generated
   - The posterior likelihood "values" (more than just density; includes likelihood of proposal) are calculated for the current and proposed values of the parameter
   - The proposed values are accepted based on the draw of a uniform number compared to a transition probability  
 - If all models are specified correctly, then regardless of starting location, each chain will converge to the posterior if run long enough
   - But, the chains must be checked for convergence when the algorithm stops
+:::
 
+## Example of Bad Convergence: Timeseries
 
-## Example of Bad Convergence
+```{r}
+mcmc_trace(model00.badSamples$draws(c("beta0", "sigma")))
+```
 
-![](badPosteriors.png)
+## Example of Bad Convergence: Densities
+
+```{r}
+mcmc_dens(model00.badSamples$draws(c("beta0", "sigma")))
+```
 
 ## Examining Chain Convergence
 
 
-
+:::{.nonincremental}
 - Once Stan stops, the next step is to determine if the chains converged to their posterior distribution
   - Called convergence diagnosis
 - Many methods have been developed for diagnosing if Markov chains have converged
-  - Two most common: visual inspection and Gelman-Rubin Potential Scale Reduction Factor (PSRF; [quick reference](https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_introbayes_sect008.htm#statug.introbayes.bayesgelman))
-  
-## Examining Chain Convergence
-  
-  
+  - Two most common: visual in spection and Gelman-Rubin Potential Scale Reduction Factor (PSRF; [quick reference](https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_introbayes_sect008.htm#statug.introbayes.bayesgelman))
 - Visual inspection
-  - Want no trends in timeseries -- should look like a caterpillar
+  - Want no trends in timeseries -- should look like a catapillar
   - Shape of posterior density should be mostly smooth
 - Gelman-Rubin PSRF (denoted with $\hat{R}$)
   - For analyses with multiple chains
   - Ratio of between-chain variance to within-chain variance
   - Should be near 1 (maximum somewhere under 1.1)
-
+:::
 
 
 ## Setting MCMC Options
@@ -551,29 +502,33 @@ model00.rstan = stan(
 :::
 
 ## The Markov Chain Timeseries
-![](posteriorPlot01.png)
+```{r}
+mcmc_trace(model00.samples$draws(c("beta0", "sigma")))
+```
 
 ## The Posterior Distribution 
-![](posteriorPlot02.png)
 
+```{r}
+mcmc_dens(model00.samples$draws(c("beta0", "sigma")))
+```
 ## Assessing Our Chains
 
 ```{r chainSummary, echo=TRUE, eval=TRUE}
 model00.samples$summary()
 ```
 
-
+:::{.nonincremental}
 - The summary function reports the PSRF (rhat)
 - Here we look at our two parameters: $\beta_0$ and $\sigma$
 - Both have $\hat{R}=1.00$, so both would be considered converged
 - ```lp__``` is posterior log likelihood--does not necessarily need examined
 - ```ess_``` columns show effect sample size for chain (factoring in autocorrelation between correlations)
   - More is better 
-
+:::
 
 ## Results Interpretation
 
-
+:::{.nonincremental}
 - At long last, with a set of converged Markov chains, we can now interpret the results
   - Here, we disregard which chain samples came from and pool all sampled values to use for results
 - We use summaries of posterior distributions when describing model parameters
@@ -581,20 +536,17 @@ model00.samples$summary()
     - The mean of the sampled values in the chain
   - Called EAP (Expected a Posteriori) estimates
   - Less common: posterior median
-  
-## Results Interpretation
-
 - Important point:
   - Posterior means are different than what characterizes the ML estimates
     - Analogous to ML estimates would be the mode of the posterior distribution
   - Especially important if looking at non-symmetric posterior distributions
     - Look at posterior for variances
   
-
+:::
 
 ## Results Interpretation
 
-
+:::{.nonincremental}
 - To summarize the uncertainty in parameters, the posterior standard deviation is used
   - The standard deviation of the sampled values in the chain
   - This is the analogous to the standard error from ML 
@@ -604,7 +556,7 @@ model00.samples$summary()
   - 95% credible interval notes that parameter is within interval with 95% confidence
 - Additionally, highest density posterior intervals can be formed
   - The narrowest range for an interval (for unimodal posterior distributions)
-
+:::
 
 ## Our Results
 
@@ -618,13 +570,9 @@ hdi(model00.samples$draws("sigma"), credMass = .9)
 ```
 
 ## The Posterior Distribution 
-
-```{r posterior2, echo=FALSE}
-
+```{r}
 mcmc_dens(model00.samples$draws(c("beta0", "sigma")))
-
 ```
-
 
 ## Wrapping Up
 

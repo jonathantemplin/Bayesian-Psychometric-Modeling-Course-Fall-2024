@@ -415,11 +415,11 @@ Lecture 3
 <section id="the-markov-chain-timeseries" class="slide level2">
 <h2>The Markov Chain Timeseries</h2>
 
-<img data-src="03_MCMC_and_Stan_files/figure-revealjs/timeseries1-1.png" width="960" class="r-stretch"></section>
+<img data-src="03_MCMC_and_Stan_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
 <section id="the-posterior-distribution" class="slide level2">
 <h2>The Posterior Distribution</h2>
 
-<img data-src="03_MCMC_and_Stan_files/figure-revealjs/posterior1-1.png" width="960" class="r-stretch"></section>
+<img data-src="03_MCMC_and_Stan_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
 <section id="markov-chain-monte-carlo-estimation" class="slide level2">
 <h2>Markov Chain Monte Carlo Estimation</h2>
 <p>Bayesian analysis is all about estimating the posterior distribution</p>
@@ -436,23 +436,17 @@ Lecture 3
 <ul>
 <li class="fragment">No longer able to use properties of the distribution to estimate parameters</li>
 </ul></li>
-</ul>
-</section>
-<section id="markov-chain-monte-carlo-estimation-1" class="slide level2">
-<h2>Markov Chain Monte Carlo Estimation</h2>
-<ul>
 <li class="fragment">It is possible to use an optimization algorithm (e.g., Newton-Raphson or Expectation-Maximization) to find maximum value of posterior distribution
 <ul>
 <li class="fragment">But, such algorithms may take a very long time for high-dimensional problems</li>
 </ul></li>
-<li class="fragment">Variational Bayesian methods also attempt to approximate the center of the posterior distribution (and are faster than optimization algorithms for large models)</li>
-<li class="fragment">Instead: MCMC “sketches” the posterior by sampling from it – then use that sketch to make inferences
+<li class="fragment">Instead: “sketch” the posterior by sampling from it – then use that sketch to make inferences
 <ul>
 <li class="fragment">Sampling is done via MCMC</li>
 </ul></li>
 </ul>
 </section>
-<section id="markov-chain-monte-carlo-estimation-2" class="slide level2">
+<section id="markov-chain-monte-carlo-estimation-1" class="slide level2">
 <h2>Markov Chain Monte Carlo Estimation</h2>
 <ul>
 <li class="fragment">MCMC algorithms iteratively sample from the posterior distribution
@@ -496,7 +490,7 @@ Lecture 3
 <ol type="1">
 <li class="fragment">A period of the Markov chain where sampling is not directly from the posterior
 <ul>
-<li class="fragment">The burnin period (sometimes coupled with other tuning periods and called warmup)</li>
+<li class="fragment">The burnin period (sometimes coupled with other tuning periods and called warmuup)</li>
 </ul></li>
 <li class="fragment">Methods used to assess convergence of the chain to the posterior distribution
 <ul>
@@ -504,11 +498,6 @@ Lecture 3
 </ul></li>
 <li class="fragment">Summaries of the posterior distribution</li>
 </ol></li>
-</ul>
-</section>
-<section id="commonalities-across-mcmc-algorithms-1" class="slide level2">
-<h2>Commonalities Across MCMC Algorithms</h2>
-<ul>
 <li class="fragment">Further, rejection-based sampling algorithms often need a tuning period to make the sampling more efficient
 <ul>
 <li class="fragment">The tuning period comes before the algorithm begins its burnin period</li>
@@ -528,7 +517,7 @@ Lecture 3
 </section>
 <section id="example-data-post-diet-weights" class="slide level2">
 <h2>Example Data: Post-Diet Weights</h2>
-<p><a href="https://stats.idre.ucla.edu/spss/library/spss-libraryhow-do-i-handle-interactions-of-continuous-andcategorical-variables/">Example Data Link</a></p>
+<p>Example Data: <a href="https://stats.idre.ucla.edu/spss/library/spss-libraryhow-do-i-handle-interactions-of-continuous-andcategorical-variables/">https://stats.idre.ucla.edu/spss/library/spss-libraryhow-do-i-handle-interactions-of-continuous-andcategorical-variables/</a></p>
 <ul>
 <li class="fragment"><p>The file DietData.csv contains data from 30 respondents who participated in a study regarding the effectiveness of three types of diets.</p></li>
 <li class="fragment"><p>Variables in the data set are:</p>
@@ -667,7 +656,7 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 <li class="fragment">Stan is an MCMC estimation program
 <ul>
 <li class="fragment">Most recent; has many convenient features</li>
-<li class="fragment">Actually does several methods of estimation (ML, Variational Bayes)</li>
+<li class="fragment">Actually does severaly methods of estimation (ML, Variational Bayes)</li>
 </ul></li>
 <li class="fragment">You create a model using Stan’s syntax
 <ul>
@@ -729,32 +718,6 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 <li>Each line ends with a semi colon</li>
 <li>Comments are put in with //</li>
 </ul></li>
-</ul>
-</div>
-</section>
-<section id="stan-syntax-r-character-object" class="slide level2">
-<h2>Stan Syntax: R Character Object</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>stanModel <span class="ot">=</span> <span class="st">"</span></span>
-<span id="cb8-2"><a href=""></a><span class="st">data {</span></span>
-<span id="cb8-3"><a href=""></a><span class="st">  int&lt;lower=0&gt; N;</span></span>
-<span id="cb8-4"><a href=""></a><span class="st">  vector[N] y;</span></span>
-<span id="cb8-5"><a href=""></a><span class="st">}</span></span>
-<span id="cb8-6"><a href=""></a></span>
-<span id="cb8-7"><a href=""></a><span class="st">parameters {</span></span>
-<span id="cb8-8"><a href=""></a><span class="st">  real beta0;</span></span>
-<span id="cb8-9"><a href=""></a><span class="st">  real&lt;lower=0&gt; sigma;</span></span>
-<span id="cb8-10"><a href=""></a><span class="st">}</span></span>
-<span id="cb8-11"><a href=""></a></span>
-<span id="cb8-12"><a href=""></a><span class="st">model {</span></span>
-<span id="cb8-13"><a href=""></a><span class="st">  beta0 ~ normal(0, 1000); // prior for beta0</span></span>
-<span id="cb8-14"><a href=""></a><span class="st">  sigma ~ uniform(0, 100000); // prior for sigma</span></span>
-<span id="cb8-15"><a href=""></a><span class="st">  y ~ normal(beta0, sigma); // model for observed data</span></span>
-<span id="cb8-16"><a href=""></a><span class="st">}</span></span>
-<span id="cb8-17"><a href=""></a><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div>
-<ul>
 <li>Three blocks of syntax needed
 <ul>
 <li>Data: What Stan expects you will send to it for the analysis (using R lists)</li>
@@ -805,11 +768,11 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 <section id="from-stan-syntax-to-compilation" class="slide level2">
 <h2>From Stan Syntax to Compilation</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># compile model -- this method is for stand-alone stan files (uses cmdstanr)</span></span>
-<span id="cb9-2"><a href=""></a>model00.fromFile <span class="ot">=</span> <span class="fu">cmdstan_model</span>(<span class="at">stan_file =</span> <span class="st">"model00.stan"</span>)</span>
-<span id="cb9-3"><a href=""></a></span>
-<span id="cb9-4"><a href=""></a><span class="co"># or this method using the string text in R</span></span>
-<span id="cb9-5"><a href=""></a>model00.fromString <span class="ot">=</span> <span class="fu">cmdstan_model</span>(<span class="at">stan_file =</span> <span class="fu">write_stan_file</span>(stanModel))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="co"># compile model -- this method is for stand-alone stan files (uses cmdstanr)</span></span>
+<span id="cb8-2"><a href=""></a>model00.fromFile <span class="ot">=</span> <span class="fu">cmdstan_model</span>(<span class="at">stan_file =</span> <span class="st">"model00.stan"</span>)</span>
+<span id="cb8-3"><a href=""></a></span>
+<span id="cb8-4"><a href=""></a><span class="co"># or this method using the string text in R</span></span>
+<span id="cb8-5"><a href=""></a>model00.fromString <span class="ot">=</span> <span class="fu">cmdstan_model</span>(<span class="at">stan_file =</span> <span class="fu">write_stan_file</span>(stanModel))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div>
 <ul>
@@ -825,19 +788,19 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 <section id="building-data-for-stan" class="slide level2">
 <h2>Building Data for Stan</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="co"># build R list containing data for Stan: Must be named what "data" are listed in analysis</span></span>
-<span id="cb10-2"><a href=""></a>stanData <span class="ot">=</span> <span class="fu">list</span>(</span>
-<span id="cb10-3"><a href=""></a>  <span class="at">N =</span> <span class="fu">nrow</span>(DietData),</span>
-<span id="cb10-4"><a href=""></a>  <span class="at">y =</span> DietData<span class="sc">$</span>WeightLB</span>
-<span id="cb10-5"><a href=""></a>)</span>
-<span id="cb10-6"><a href=""></a></span>
-<span id="cb10-7"><a href=""></a><span class="co"># snippet of Stan syntax:</span></span>
-<span id="cb10-8"><a href=""></a>stanSyntaxSnippet <span class="ot">=</span> <span class="st">"</span></span>
-<span id="cb10-9"><a href=""></a><span class="st">data {</span></span>
-<span id="cb10-10"><a href=""></a><span class="st">  int&lt;lower=0&gt; N;</span></span>
-<span id="cb10-11"><a href=""></a><span class="st">  vector[N] y;</span></span>
-<span id="cb10-12"><a href=""></a><span class="st">}</span></span>
-<span id="cb10-13"><a href=""></a><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># build R list containing data for Stan: Must be named what "data" are listed in analysis</span></span>
+<span id="cb9-2"><a href=""></a>stanData <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb9-3"><a href=""></a>  <span class="at">N =</span> <span class="fu">nrow</span>(DietData),</span>
+<span id="cb9-4"><a href=""></a>  <span class="at">y =</span> DietData<span class="sc">$</span>WeightLB</span>
+<span id="cb9-5"><a href=""></a>)</span>
+<span id="cb9-6"><a href=""></a></span>
+<span id="cb9-7"><a href=""></a><span class="co"># snippet of Stan syntax:</span></span>
+<span id="cb9-8"><a href=""></a>stanSyntaxSnippet <span class="ot">=</span> <span class="st">"</span></span>
+<span id="cb9-9"><a href=""></a><span class="st">data {</span></span>
+<span id="cb9-10"><a href=""></a><span class="st">  int&lt;lower=0&gt; N;</span></span>
+<span id="cb9-11"><a href=""></a><span class="st">  vector[N] y;</span></span>
+<span id="cb9-12"><a href=""></a><span class="st">}</span></span>
+<span id="cb9-13"><a href=""></a><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div>
 <ul>
@@ -854,19 +817,19 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 <section id="running-markov-chains-in-cmdstanr" class="slide level2">
 <h2>Running Markov Chains in <code>cmdstanr</code></h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a><span class="co"># run MCMC chain (sample from posterior)</span></span>
-<span id="cb11-2"><a href=""></a>model00.samples <span class="ot">=</span> model00.fromFile<span class="sc">$</span><span class="fu">sample</span>(</span>
-<span id="cb11-3"><a href=""></a>  <span class="at">data =</span> stanData,</span>
-<span id="cb11-4"><a href=""></a>  <span class="at">seed =</span> <span class="dv">1</span>,</span>
-<span id="cb11-5"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
-<span id="cb11-6"><a href=""></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
-<span id="cb11-7"><a href=""></a>  <span class="at">iter_warmup =</span> <span class="dv">10000</span>,</span>
-<span id="cb11-8"><a href=""></a>  <span class="at">iter_sampling =</span> <span class="dv">10000</span></span>
-<span id="cb11-9"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="co"># run MCMC chain (sample from posterior)</span></span>
+<span id="cb10-2"><a href=""></a>model00.samples <span class="ot">=</span> model00.fromFile<span class="sc">$</span><span class="fu">sample</span>(</span>
+<span id="cb10-3"><a href=""></a>  <span class="at">data =</span> stanData,</span>
+<span id="cb10-4"><a href=""></a>  <span class="at">seed =</span> <span class="dv">1</span>,</span>
+<span id="cb10-5"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb10-6"><a href=""></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
+<span id="cb10-7"><a href=""></a>  <span class="at">iter_warmup =</span> <span class="dv">10000</span>,</span>
+<span id="cb10-8"><a href=""></a>  <span class="at">iter_sampling =</span> <span class="dv">10000</span></span>
+<span id="cb10-9"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div>
 <ul>
-<li>The next step is to run the Markov Chain (sample from the posterior distribution)</li>
+<li>With the compiled program and the data, the next step is to run the Markov Chain (a process sometimes called sampling as you are sampling from a posterior distribution)</li>
 <li>In <code>cmdstanr</code>, running the chain comes from the <code>$sample()</code> function that is a part of the compiled program object</li>
 <li>You must specify:
 <ul>
@@ -882,19 +845,19 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 <section id="running-markov-chains-in-rstan" class="slide level2">
 <h2>Running Markov Chains in <code>rstan</code></h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="fu">rstan_options</span>(<span class="at">auto_write =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-2"><a href=""></a><span class="fu">options</span>(<span class="at">mc.cores =</span> parallel<span class="sc">::</span><span class="fu">detectCores</span>())</span>
-<span id="cb12-3"><a href=""></a></span>
-<span id="cb12-4"><a href=""></a><span class="co"># example MCMC analysis in rstan</span></span>
-<span id="cb12-5"><a href=""></a>model00.rstan <span class="ot">=</span> <span class="fu">stan</span>(</span>
-<span id="cb12-6"><a href=""></a>  <span class="at">model_code =</span> stanModel,</span>
-<span id="cb12-7"><a href=""></a>  <span class="at">model_name =</span> <span class="st">"Empty model"</span>,</span>
-<span id="cb12-8"><a href=""></a>  <span class="at">data =</span> stanData,</span>
-<span id="cb12-9"><a href=""></a>  <span class="at">warmup =</span> <span class="dv">10000</span>,</span>
-<span id="cb12-10"><a href=""></a>  <span class="at">iter =</span> <span class="dv">20000</span>,</span>
-<span id="cb12-11"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
-<span id="cb12-12"><a href=""></a>  <span class="at">verbose =</span> <span class="cn">TRUE</span></span>
-<span id="cb12-13"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a><span class="fu">rstan_options</span>(<span class="at">auto_write =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-2"><a href=""></a><span class="fu">options</span>(<span class="at">mc.cores =</span> parallel<span class="sc">::</span><span class="fu">detectCores</span>())</span>
+<span id="cb11-3"><a href=""></a></span>
+<span id="cb11-4"><a href=""></a><span class="co"># example MCMC analysis in rstan</span></span>
+<span id="cb11-5"><a href=""></a>model00.rstan <span class="ot">=</span> <span class="fu">stan</span>(</span>
+<span id="cb11-6"><a href=""></a>  <span class="at">model_code =</span> stanModel,</span>
+<span id="cb11-7"><a href=""></a>  <span class="at">model_name =</span> <span class="st">"Empty model"</span>,</span>
+<span id="cb11-8"><a href=""></a>  <span class="at">data =</span> stanData,</span>
+<span id="cb11-9"><a href=""></a>  <span class="at">warmup =</span> <span class="dv">10000</span>,</span>
+<span id="cb11-10"><a href=""></a>  <span class="at">iter =</span> <span class="dv">20000</span>,</span>
+<span id="cb11-11"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb11-12"><a href=""></a>  <span class="at">verbose =</span> <span class="cn">TRUE</span></span>
+<span id="cb11-13"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div>
 <ul>
@@ -910,64 +873,62 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 </section>
 <section id="mcmc-process" class="slide level2">
 <h2>MCMC Process</h2>
+<div>
 <ul>
-<li class="fragment">The MCMC algorithm runs as a series of discrete iterations
+<li>The MCMC algorithm runs as a series of discrete iterations
 <ul>
-<li class="fragment">Within each iteration, each parameter of a model has an opportunity to change its value</li>
+<li>Within each iteration, each parameter of a model has an opportunity to change its value</li>
 </ul></li>
-<li class="fragment">For each parameter, a new parameter is sampled at random from the current belief of posterior distribution
+<li>For each parameter, a new parameter is sampled at random from the current belief of posterior distribution
 <ul>
-<li class="fragment">The specifics of the sampling process differ by algorithm type (we’ll have a lecture on this later)</li>
+<li>The specifics of the sampling process differ by algorithm type (we’ll have a lecture on this later)</li>
 </ul></li>
-</ul>
-</section>
-<section id="mcmc-process-1" class="slide level2">
-<h2>MCMC Process</h2>
+<li>In Stan (Hamiltonian Monte Carlo), for a given iteration, a proposed parameter is generated
 <ul>
-<li class="fragment">In Stan (Hamiltonian Monte Carlo), for a given iteration, a proposed parameter is generated
-<ul>
-<li class="fragment">The posterior likelihood “values” (more than just density; includes likelihood of proposal) are calculated for the current and proposed values of the parameter</li>
-<li class="fragment">The proposed values are accepted based on the draw of a uniform number compared to a transition probability<br>
+<li>The posterior likelihood “values” (more than just density; includes likelihood of proposal) are calculated for the current and proposed values of the parameter</li>
+<li>The proposed values are accepted based on the draw of a uniform number compared to a transition probability<br>
 </li>
 </ul></li>
-<li class="fragment">If all models are specified correctly, then regardless of starting location, each chain will converge to the posterior if run long enough
+<li>If all models are specified correctly, then regardless of starting location, each chain will converge to the posterior if run long enough
 <ul>
-<li class="fragment">But, the chains must be checked for convergence when the algorithm stops</li>
+<li>But, the chains must be checked for convergence when the algorithm stops</li>
 </ul></li>
 </ul>
+</div>
 </section>
-<section id="example-of-bad-convergence" class="slide level2">
-<h2>Example of Bad Convergence</h2>
+<section id="example-of-bad-convergence-timeseries" class="slide level2">
+<h2>Example of Bad Convergence: Timeseries</h2>
 
-<img data-src="badPosteriors.png" class="r-stretch"></section>
+<img data-src="03_MCMC_and_Stan_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
+<section id="example-of-bad-convergence-densities" class="slide level2">
+<h2>Example of Bad Convergence: Densities</h2>
+
+<img data-src="03_MCMC_and_Stan_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
 <section id="examining-chain-convergence" class="slide level2">
 <h2>Examining Chain Convergence</h2>
+<div>
 <ul>
-<li class="fragment">Once Stan stops, the next step is to determine if the chains converged to their posterior distribution
+<li>Once Stan stops, the next step is to determine if the chains converged to their posterior distribution
 <ul>
-<li class="fragment">Called convergence diagnosis</li>
+<li>Called convergence diagnosis</li>
 </ul></li>
-<li class="fragment">Many methods have been developed for diagnosing if Markov chains have converged
+<li>Many methods have been developed for diagnosing if Markov chains have converged
 <ul>
-<li class="fragment">Two most common: visual inspection and Gelman-Rubin Potential Scale Reduction Factor (PSRF; <a href="https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_introbayes_sect008.htm#statug.introbayes.bayesgelman">quick reference</a>)</li>
+<li>Two most common: visual in spection and Gelman-Rubin Potential Scale Reduction Factor (PSRF; <a href="https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_introbayes_sect008.htm#statug.introbayes.bayesgelman">quick reference</a>)</li>
 </ul></li>
-</ul>
-</section>
-<section id="examining-chain-convergence-1" class="slide level2">
-<h2>Examining Chain Convergence</h2>
+<li>Visual inspection
 <ul>
-<li class="fragment">Visual inspection
-<ul>
-<li class="fragment">Want no trends in timeseries – should look like a caterpillar</li>
-<li class="fragment">Shape of posterior density should be mostly smooth</li>
+<li>Want no trends in timeseries – should look like a catapillar</li>
+<li>Shape of posterior density should be mostly smooth</li>
 </ul></li>
-<li class="fragment">Gelman-Rubin PSRF (denoted with <span class="math inline">\(\hat{R}\)</span>)
+<li>Gelman-Rubin PSRF (denoted with <span class="math inline">\(\hat{R}\)</span>)
 <ul>
-<li class="fragment">For analyses with multiple chains</li>
-<li class="fragment">Ratio of between-chain variance to within-chain variance</li>
-<li class="fragment">Should be near 1 (maximum somewhere under 1.1)</li>
+<li>For analyses with multiple chains</li>
+<li>Ratio of between-chain variance to within-chain variance</li>
+<li>Should be near 1 (maximum somewhere under 1.1)</li>
 </ul></li>
 </ul>
+</div>
 </section>
 <section id="setting-mcmc-options" class="slide level2">
 <h2>Setting MCMC Options</h2>
@@ -995,15 +956,15 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 <section id="the-markov-chain-timeseries-1" class="slide level2">
 <h2>The Markov Chain Timeseries</h2>
 
-<img data-src="posteriorPlot01.png" class="r-stretch"></section>
+<img data-src="03_MCMC_and_Stan_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
 <section id="the-posterior-distribution-1" class="slide level2">
 <h2>The Posterior Distribution</h2>
 
-<img data-src="posteriorPlot02.png" class="r-stretch"></section>
+<img data-src="03_MCMC_and_Stan_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 <section id="assessing-our-chains" class="slide level2">
 <h2>Assessing Our Chains</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>model00.samples<span class="sc">$</span><span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>model00.samples<span class="sc">$</span><span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 10
   variable   mean median    sd   mad     q5    q95  rhat ess_bulk ess_tail
@@ -1013,75 +974,76 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 3 sigma      51.8   51.0  7.20 6.84    41.5   64.8  1.00   29147.   24620.</code></pre>
 </div>
 </div>
+<div>
 <ul>
-<li class="fragment">The summary function reports the PSRF (rhat)</li>
-<li class="fragment">Here we look at our two parameters: <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\sigma\)</span></li>
-<li class="fragment">Both have <span class="math inline">\(\hat{R}=1.00\)</span>, so both would be considered converged</li>
-<li class="fragment"><code>lp__</code> is posterior log likelihood–does not necessarily need examined</li>
-<li class="fragment"><code>ess_</code> columns show effect sample size for chain (factoring in autocorrelation between correlations)
+<li>The summary function reports the PSRF (rhat)</li>
+<li>Here we look at our two parameters: <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\sigma\)</span></li>
+<li>Both have <span class="math inline">\(\hat{R}=1.00\)</span>, so both would be considered converged</li>
+<li><code>lp__</code> is posterior log likelihood–does not necessarily need examined</li>
+<li><code>ess_</code> columns show effect sample size for chain (factoring in autocorrelation between correlations)
 <ul>
-<li class="fragment">More is better</li>
+<li>More is better</li>
 </ul></li>
 </ul>
+</div>
 </section>
 <section id="results-interpretation" class="slide level2">
 <h2>Results Interpretation</h2>
+<div>
 <ul>
-<li class="fragment">At long last, with a set of converged Markov chains, we can now interpret the results
+<li>At long last, with a set of converged Markov chains, we can now interpret the results
 <ul>
-<li class="fragment">Here, we disregard which chain samples came from and pool all sampled values to use for results</li>
+<li>Here, we disregard which chain samples came from and pool all sampled values to use for results</li>
 </ul></li>
-<li class="fragment">We use summaries of posterior distributions when describing model parameters
+<li>We use summaries of posterior distributions when describing model parameters
 <ul>
-<li class="fragment">Typical summary: the posterior mean
+<li>Typical summary: the posterior mean
 <ul>
-<li class="fragment">The mean of the sampled values in the chain</li>
+<li>The mean of the sampled values in the chain</li>
 </ul></li>
-<li class="fragment">Called EAP (Expected a Posteriori) estimates</li>
-<li class="fragment">Less common: posterior median</li>
+<li>Called EAP (Expected a Posteriori) estimates</li>
+<li>Less common: posterior median</li>
+</ul></li>
+<li>Important point:
+<ul>
+<li>Posterior means are different than what characterizes the ML estimates
+<ul>
+<li>Analogous to ML estimates would be the mode of the posterior distribution</li>
+</ul></li>
+<li>Especially important if looking at non-symmetric posterior distributions
+<ul>
+<li>Look at posterior for variances</li>
+</ul></li>
 </ul></li>
 </ul>
+</div>
 </section>
 <section id="results-interpretation-1" class="slide level2">
 <h2>Results Interpretation</h2>
+<div>
 <ul>
-<li class="fragment">Important point:
+<li>To summarize the uncertainty in parameters, the posterior standard deviation is used
 <ul>
-<li class="fragment">Posterior means are different than what characterizes the ML estimates
-<ul>
-<li class="fragment">Analogous to ML estimates would be the mode of the posterior distribution</li>
+<li>The standard deviation of the sampled values in the chain</li>
+<li>This is the analogous to the standard error from ML</li>
 </ul></li>
-<li class="fragment">Especially important if looking at non-symmetric posterior distributions
+<li>Bayesian credible intervals are formed by taking quantiles of the posterior distribution
 <ul>
-<li class="fragment">Look at posterior for variances</li>
+<li>Analogous to confidence intervals</li>
+<li>Interpretation slightly different – the probability the parameter lies within the interval</li>
+<li>95% credible interval notes that parameter is within interval with 95% confidence</li>
 </ul></li>
-</ul></li>
-</ul>
-</section>
-<section id="results-interpretation-2" class="slide level2">
-<h2>Results Interpretation</h2>
+<li>Additionally, highest density posterior intervals can be formed
 <ul>
-<li class="fragment">To summarize the uncertainty in parameters, the posterior standard deviation is used
-<ul>
-<li class="fragment">The standard deviation of the sampled values in the chain</li>
-<li class="fragment">This is the analogous to the standard error from ML</li>
-</ul></li>
-<li class="fragment">Bayesian credible intervals are formed by taking quantiles of the posterior distribution
-<ul>
-<li class="fragment">Analogous to confidence intervals</li>
-<li class="fragment">Interpretation slightly different – the probability the parameter lies within the interval</li>
-<li class="fragment">95% credible interval notes that parameter is within interval with 95% confidence</li>
-</ul></li>
-<li class="fragment">Additionally, highest density posterior intervals can be formed
-<ul>
-<li class="fragment">The narrowest range for an interval (for unimodal posterior distributions)</li>
+<li>The narrowest range for an interval (for unimodal posterior distributions)</li>
 </ul></li>
 </ul>
+</div>
 </section>
 <section id="our-results" class="slide level2">
 <h2>Our Results</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>model00.samples<span class="sc">$</span><span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a>model00.samples<span class="sc">$</span><span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 10
   variable   mean median    sd   mad     q5    q95  rhat ess_bulk ess_tail
@@ -1090,14 +1052,14 @@ Residual standard error: 49.52 on 29 degrees of freedom</code></pre>
 2 beta0     171.   171.   9.44 9.31   155.   186.   1.00   29639.   25175.
 3 sigma      51.8   51.0  7.20 6.84    41.5   64.8  1.00   29147.   24620.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a><span class="fu">hdi</span>(model00.samples<span class="sc">$</span><span class="fu">draws</span>(<span class="st">"beta0"</span>), <span class="at">credMass =</span> .<span class="dv">9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a><span class="fu">hdi</span>(model00.samples<span class="sc">$</span><span class="fu">draws</span>(<span class="st">"beta0"</span>), <span class="at">credMass =</span> .<span class="dv">9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  lower   upper 
 155.015 185.762 
 attr(,"credMass")
 [1] 0.9</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a><span class="fu">hdi</span>(model00.samples<span class="sc">$</span><span class="fu">draws</span>(<span class="st">"sigma"</span>), <span class="at">credMass =</span> .<span class="dv">9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a><span class="fu">hdi</span>(model00.samples<span class="sc">$</span><span class="fu">draws</span>(<span class="st">"sigma"</span>), <span class="at">credMass =</span> .<span class="dv">9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  lower   upper 
 40.2305 63.0083 
@@ -1109,7 +1071,7 @@ attr(,"credMass")
 <section id="the-posterior-distribution-2" class="slide level2">
 <h2>The Posterior Distribution</h2>
 
-<img data-src="03_MCMC_and_Stan_files/figure-revealjs/posterior2-1.png" width="960" class="r-stretch"></section>
+<img data-src="03_MCMC_and_Stan_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
 <section id="wrapping-up" class="slide level2">
 <h2>Wrapping Up</h2>
 <div>
@@ -1121,7 +1083,7 @@ attr(,"credMass")
 </div>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
-<p><a href="https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/">https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/</a></p>
+<p><a href="https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2022/">https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2022/</a></p>
 </div>
 </div>
 </section>
