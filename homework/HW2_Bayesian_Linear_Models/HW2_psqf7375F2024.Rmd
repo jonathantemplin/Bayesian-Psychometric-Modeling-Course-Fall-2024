@@ -1,0 +1,155 @@
+---
+title: 'Homework #2'
+author: "Bayesian Psychometric Modeling (PSQF 7375, Fall 2024)"
+date: "Due Friday, October 4th, 2022 at 11:59pm in ICON"
+output: word_document
+---
+
+## Bayesian Linear Models
+
+The objectives of this homework are:
+
+1. To learn how to estimate a univariate (single predictor) linear model using MCMC
+
+### General Instructions:
+
+This homework focuses on a study of 220 undergraduates conducted in the Department of Wordology at Midwestern State University that explores the contributions of abilities and environment in playing Scrabble. Because of the heavy verbal component of playing Scrabble successfully, students were assessed on their verbal ability via the Boston Naming Test, which consists of 60 drawings the respondent must name correctly (1 point per drawing, such that possible scores range from 0 to 60). Also of interest was the extent to which spatial abilities contribute to Scrabble success. To that end, spatial ability was assessed with the Block Design test, in which participants are shown 17 patterns that must be re-created via colored blocks (1 point per drawing, such that possible scores range from 0 to 17). Finally, the contribution of environment was examined by randomly assigning participants to one of two kinds of opponents: an easy opponent (who was instructed to play simple words and to avoid the double- or triple-letter or word squares), or a hard opponent (who was instructed to play well in order to score as many points as possible). The outcome was the total score at the end of three Scrabble games, in which higher scores are better.
+
+Your task is to estimate the general linear models needed to answer the research questions below. Use the easy opponent as the reference group, center verbal ability at 30, and center spatial ability at 10. The needed estimates may be provided by the model or they may need to be requested separately as linear combinations of model fixed effects (which will be part of a posterior distribution). 
+
+#### For all questions below, when estimates are requested, report:
+
+* The posterior mean (EAP) 
+* The posterior standard deviation 
+* The 95% highest density posterior interval (lower and upper bound)
+
+#### To estimate each model, use Stan with the following options: 
+
+* Four chains
+* Warmup of 2000 iterations
+* Sampling of 2000 iterations
+* Uninformative prior distributions for all model parameters (your choice of distribution) 
+
+You may work with other students in building the homework, but your answers and syntax must not be copied from anyone else.
+
+
+### Submission Instructions:
+
+Please submit your homework as an R Markdown file where all R syntax is embedded as chunks and each answer is provided using your words (text answers are required, not just output) following each question in the section marked **My Answer**. 
+
+**Name your file with your first and last name and submit your file to ICON.**
+
+### Data File
+
+The data file is available for download at [https://jonathantemplin.com/wp-content/uploads/2024/09/HW2data_psqf7375_bpmF2024.xlsx](https://jonathantemplin.com/wp-content/uploads/2024/09/HW2data_psqf7375_bpmF2024.xlsx)
+
+The variables are:
+
+* PersonID: The ID number of the observation
+* opponent: Which type of opponent was played (1 == easy; 2 == hard)
+* verbal: Score on Boston Naming Test
+* spatial: Score on Block Design test
+* scrabble: Scabble score from game played
+
+### Section 1
+
+For section 1, estimate a model including additive linear effects of opponent type, verbal ability, and spatial ability. 
+
+**1. Did your Markov chains converge? What evidence do you have to support your answer?**
+
+**My Answer**
+
+
+**2. What is the amount of outcome variance leftover after controlling for the predictors?** (see estimate details above for what to report)
+
+**My Answer**
+
+**3. What is the proportion of outcome variance accounted for by the model?** (see estimate details above for what to report)
+
+**My Answer**
+
+**4. What is the estimate for the intercept?** (see estimate details above for what to report)
+
+**My Answer**
+
+**5. What is the estimate for slope of easy vs. hard opponent?** (see estimate details above for what to report)
+
+**My Answer**
+
+**6. What is the estimate for slope of verbal ability?** (see estimate details above for what to report)
+
+**My Answer**
+
+**7. What is the estimate for slope of spatial ability?** (see estimate details above for what to report)
+
+**My Answer**
+
+### Section 2
+
+Building on the previous model, in section 2 estimate a model that examines the extent to which opponent type moderates the linear effect of verbal ability and opponent type moderates the linear effect of spatial ability. 
+
+**8. What is the amount of outcome variance that is unexplained by the moderation model?** (see estimate details above for what to report)
+
+**My Answer**
+
+**9. What is the proportion of variance accounted for by the model?** (see estimate details above for what to report)
+
+**My Answer**
+
+**10. What is the proportion of variance accounted for by the model?** (see estimate details above for what to report)
+
+**My Answer**
+
+**11. What is the change in the EAP estimates (means) of the proportion of explained variance due to moderation by opponent?**
+
+**My Answer**
+
+**12. What is the change in the EAP estimates (means) of the proportion of explained variance due to moderation by opponent?**
+
+**My Answer**
+
+**13. What is the estimate for the intercept?** (see estimate details above for what to report)
+
+**My Answer**
+
+**14. What is the estimate for the slope of easy vs. hard opponent at verbal=30 and spatial=10?** (see estimate details above for what to report)
+
+**My Answer**
+
+**15. What is the estimate of the slope of verbal ability when playing easy opponents?** (see estimate details above for what to report)
+
+**My Answer**
+
+**16. What is the estimate of the slope of verbal ability when playing hard opponents?** (see estimate details above for what to report)
+
+**My Answer**
+
+**17. What is the estimate for the difference in the slope of verbal ability between easy vs. hard opponents** (see estimate details above for what to report)
+
+**My Answer**
+
+**18. What is the estimate for the slope of spatial ability when playing easy opponents** (see estimate details above for what to report)
+
+**My Answer**
+
+**19. What is the estimate for the slope of spatial ability when playing hard opponents** (see estimate details above for what to report)
+
+**My Answer**
+
+**20. What is the estimate for the difference in the slope of spatial ability between easy vs. hard opponents** (see estimate details above for what to report)
+
+**My Answer**
+
+### Section 3
+
+For section 3, please write a results section describing your findings. As a guide, I am including the results section from HW #6 of Lesa Hoffman's Intermediate Statistical Models course in a comment. You may borrow the text below, but will need to change the details to fit the Bayesian analysis.
+
+> The extent to which verbal ability and spatial ability could predict Scrabble performance while playing either easy or hard opponents was examined in a sample of 220 undergraduates at a Midwestern State University. More specifically, a series of general linear models were estimated to examine the additive and interactive effects of ability and enviroment in playing three games of Scrabble. To serve as a baseline, a model with main effects of opponent type (easy vs. hard), verbal ability (the Boston Naming Test, centered at 30), and spatial ability (the Block Design Test, centered at 10) was examined first. This baseline main effects model accounted for ____ variance in Scrabble scores, ____, _____, ____, ____. The fixed intercept of _____ (SE = ____) was the expected three-game Scrabble total for the reference person, someone with verbal ability of 30 and spatial ability of 10 playing an easy opponent. The ____ of opponent of ____ (SE = ____) indicated that persons playing hard opponents scored ____ than persons playing easy opponents. The ____ of verbal ability of ____ (SE = ____) indicated that persons with higher verbal ability scored ____ than persons with lower verbal ability. Finally, the ____ of spatial ability of ____ (SE = ____) indicated that persons with higher spatial ability scored ____ than persons with lower spatial ability. 
+
+> Next, to examine the extent to which environment moderates the effects of ability, two-way interactions of opponent by verbal ability and opponent by spatial ability were added to the model. The augmented model accounted for ____ variance in Scrabble scores, ____ (____, ____) = ____, ____ = ____, ____ = ____, ____ = ____. The addition of the two opponent-related interactions resulted in a ____ of ____, ____, ____. First, the ____ of opponent by verbal ability of ____ ____ revealed that the effect of verbal ability was ____ ____ when playing hard opponents as opposed to easy opponents. More specifically, the ____ of verbal ability when playing easy opponents of ____ (SE = ____) was ____, and the ____ of verbal ability when playing hard opponents of ____ (SE = ____) was ____ . Second, the ____ of opponent by spatial ability of ____ (SE = ____) revealed that the effect of spatial ability was ____ ____ when playing hard opponents as opposed to easy opponents. More specifically, the ____ of spatial ability when playing easy opponents of ____ (SE = ____) was ____ , and the ____ of spatial ability when playing hard opponents of ____ (SE = ____) was ____ . 
+
+
+**My Answer**
+
+
+
