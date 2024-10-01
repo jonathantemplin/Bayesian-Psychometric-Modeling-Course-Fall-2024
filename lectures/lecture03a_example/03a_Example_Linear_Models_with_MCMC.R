@@ -8,7 +8,7 @@ for(i in 1:length(needed_packages)){
   library(needed_packages[i], character.only = TRUE)
 }
 
-if (!requireNamespace("modeest")) install.packages("modeest")
+if (!require("modeest")) install.packages("modeest")
 library(modeest)
 
 
@@ -581,15 +581,4 @@ mcmc_dens(model06_Samples$draws())
 # which models fit the best?
 # how can we tell?
 
-# next week:
-#   model comparison with WAIC
-#   posterior predictive model checks
-#   combinations of parameters
-
-
-# Wednesday's class
-# 1. finish example (culminating with matrices)
-    # a. Add effects for variances
-# 2. add generated quantities for example for R^2 and for new effects
-#
 
