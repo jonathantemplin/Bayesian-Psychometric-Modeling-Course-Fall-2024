@@ -91,13 +91,19 @@ modelCFA_data = list(
   psiRate = psiRateVecHP
 )
 
+# create standardized sum scores for latent variable initialization values
+sumScores = rowSums(conspiracyItems)
+initTheta = (sumScores - mean(sumScores))/sd(sumScores)
+
 modelCFA_samples = modelCFA_stan$sample(
   data = modelCFA_data,
   seed = 09102022,
   chains = 4,
   parallel_chains = 4,
   iter_warmup = 2000,
-  iter_sampling = 2000
+  iter_sampling = 2000,
+  init = function() list(lambda=rnorm(nItems, mean=10, sd=2),
+                         theta=rnorm(nObs, mean=initTheta, sd=0))
 )
 
 # checking convergence

@@ -625,23 +625,35 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 </ul></li>
 </ul>
 </section>
-<section id="stans-data-block" class="slide level2">
-<h2>Stan’s <code>data {}</code> Block</h2>
+<section id="stans-model-block" class="slide level2">
+<h2>Stan’s <code>model</code> Block</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>data {</span>
-<span id="cb1-2"><a href=""></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> nObs;                 <span class="sc">/</span><span class="er">/</span> number of observations</span>
-<span id="cb1-3"><a href=""></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> nItems;               <span class="sc">/</span><span class="er">/</span> number of items</span>
-<span id="cb1-4"><a href=""></a>  matrix[nObs, nItems] Y;            <span class="sc">/</span><span class="er">/</span> item responses <span class="cf">in</span> a matrix</span>
-<span id="cb1-5"><a href=""></a></span>
-<span id="cb1-6"><a href=""></a>  vector[nItems] meanMu;</span>
-<span id="cb1-7"><a href=""></a>  matrix[nItems, nItems] covMu;      <span class="sc">/</span><span class="er">/</span> prior covariance matrix <span class="cf">for</span> coefficients</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>model {</span>
+<span id="cb1-2"><a href=""></a>  </span>
+<span id="cb1-3"><a href=""></a>  lambda <span class="sc">~</span> <span class="fu">multi_normal</span>(meanLambda, covLambda); <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> item discrimination<span class="sc">/</span>factor loadings</span>
+<span id="cb1-4"><a href=""></a>  mu <span class="sc">~</span> <span class="fu">multi_normal</span>(meanMu, covMu);             <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> item intercepts</span>
+<span id="cb1-5"><a href=""></a>  psi <span class="sc">~</span> <span class="fu">exponential</span>(psiRate);                   <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> unique standard deviations</span>
+<span id="cb1-6"><a href=""></a>  </span>
+<span id="cb1-7"><a href=""></a>  theta <span class="sc">~</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>);                         <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> latent <span class="fu">variable</span> (with mean<span class="sc">/</span>sd specified)</span>
 <span id="cb1-8"><a href=""></a>  </span>
-<span id="cb1-9"><a href=""></a>  vector[nItems] meanLambda;         <span class="sc">/</span><span class="er">/</span> prior mean vector <span class="cf">for</span> coefficients</span>
-<span id="cb1-10"><a href=""></a>  matrix[nItems, nItems] covLambda;  <span class="sc">/</span><span class="er">/</span> prior covariance matrix <span class="cf">for</span> coefficients</span>
-<span id="cb1-11"><a href=""></a>  </span>
-<span id="cb1-12"><a href=""></a>  vector[nItems] psiRate;            <span class="sc">/</span><span class="er">/</span> prior rate parameter <span class="cf">for</span> unique standard deviations</span>
+<span id="cb1-9"><a href=""></a>  <span class="cf">for</span> (item <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nItems){</span>
+<span id="cb1-10"><a href=""></a>    Y[,item] <span class="sc">~</span> <span class="fu">normal</span>(mu[item] <span class="sc">+</span> lambda[item]<span class="sc">*</span>theta, psi[item]);</span>
+<span id="cb1-11"><a href=""></a>  }</span>
+<span id="cb1-12"><a href=""></a>  </span>
 <span id="cb1-13"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>The loop here conducts the model, separately, for each item</p>
+<ul>
+<li>Assumption of conditional independence enables this
+<ul>
+<li>Non-independence would need multivariate normal model</li>
+</ul></li>
+<li>The item mean is set by the conditional mean of the model
+<ul>
+<li>The item SD is set by the unique variance parameter</li>
+</ul></li>
+<li>The loop puts each item’s parameters into the equation</li>
+</ul>
 </section>
 <section id="stans-parameters-block" class="slide level2">
 <h2>Stan’s <code>parameters {}</code> Block</h2>
@@ -664,37 +676,26 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <li>Currently using 09102022: works fine</li>
 <li>Change to 25102022: big problems</li>
 </ul></li>
+<li>Our fix will be to set starting values for all <span class="math inline">\(\lambda_i\)</span> and <span class="math inline">\(\theta_p\)</span></li>
 </ul>
 </section>
-<section id="stans-model-block" class="slide level2">
-<h2>Stan’s <code>model</code> Block</h2>
+<section id="stans-data-block" class="slide level2">
+<h2>Stan’s <code>data {}</code> Block</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>model {</span>
-<span id="cb3-2"><a href=""></a>  </span>
-<span id="cb3-3"><a href=""></a>  lambda <span class="sc">~</span> <span class="fu">multi_normal</span>(meanLambda, covLambda); <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> item discrimination<span class="sc">/</span>factor loadings</span>
-<span id="cb3-4"><a href=""></a>  mu <span class="sc">~</span> <span class="fu">multi_normal</span>(meanMu, covMu);             <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> item intercepts</span>
-<span id="cb3-5"><a href=""></a>  psi <span class="sc">~</span> <span class="fu">exponential</span>(psiRate);                   <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> unique standard deviations</span>
-<span id="cb3-6"><a href=""></a>  </span>
-<span id="cb3-7"><a href=""></a>  theta <span class="sc">~</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>);                         <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> latent <span class="fu">variable</span> (with mean<span class="sc">/</span>sd specified)</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>data {</span>
+<span id="cb3-2"><a href=""></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> nObs;                 <span class="sc">/</span><span class="er">/</span> number of observations</span>
+<span id="cb3-3"><a href=""></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> nItems;               <span class="sc">/</span><span class="er">/</span> number of items</span>
+<span id="cb3-4"><a href=""></a>  matrix[nObs, nItems] Y;            <span class="sc">/</span><span class="er">/</span> item responses <span class="cf">in</span> a matrix</span>
+<span id="cb3-5"><a href=""></a></span>
+<span id="cb3-6"><a href=""></a>  vector[nItems] meanMu;</span>
+<span id="cb3-7"><a href=""></a>  matrix[nItems, nItems] covMu;      <span class="sc">/</span><span class="er">/</span> prior covariance matrix <span class="cf">for</span> coefficients</span>
 <span id="cb3-8"><a href=""></a>  </span>
-<span id="cb3-9"><a href=""></a>  <span class="cf">for</span> (item <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nItems){</span>
-<span id="cb3-10"><a href=""></a>    Y[,item] <span class="sc">~</span> <span class="fu">normal</span>(mu[item] <span class="sc">+</span> lambda[item]<span class="sc">*</span>theta, psi[item]);</span>
-<span id="cb3-11"><a href=""></a>  }</span>
-<span id="cb3-12"><a href=""></a>  </span>
+<span id="cb3-9"><a href=""></a>  vector[nItems] meanLambda;         <span class="sc">/</span><span class="er">/</span> prior mean vector <span class="cf">for</span> coefficients</span>
+<span id="cb3-10"><a href=""></a>  matrix[nItems, nItems] covLambda;  <span class="sc">/</span><span class="er">/</span> prior covariance matrix <span class="cf">for</span> coefficients</span>
+<span id="cb3-11"><a href=""></a>  </span>
+<span id="cb3-12"><a href=""></a>  vector[nItems] psiRate;            <span class="sc">/</span><span class="er">/</span> prior rate parameter <span class="cf">for</span> unique standard deviations</span>
 <span id="cb3-13"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The loop here conducts the model, separately, for each item</p>
-<ul>
-<li>Assumption of conditional independence enables this
-<ul>
-<li>Non-independence would need multivariate normal model</li>
-</ul></li>
-<li>The item mean is set by the conditional mean of the model
-<ul>
-<li>The item SD is set by the unique variance parameter</li>
-</ul></li>
-<li>The loop puts each item’s parameters into the equation</li>
-</ul>
 </section>
 <section id="choosing-prior-distributions-for-parameters" class="slide level2">
 <h2>Choosing Prior Distributions for Parameters</h2>
@@ -762,28 +763,61 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <li>10 observed variables (with three item parameters each: <span class="math inline">\(\mu_i\)</span>, <span class="math inline">\(\lambda_i\)</span>, and <span class="math inline">\(\psi_i\)</span>)</li>
 <li>177 latent variables (one for each person: 177 parameters)</li>
 </ul></li>
-<li>Key syntax block is the observed variable definition:</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>Y[,item] <span class="sc">~</span> <span class="fu">normal</span>(mu[item] <span class="sc">+</span> lambda[item]<span class="sc">*</span>theta, psi[item]);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<ul>
 <li>cmdstanr samples call:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>modelCFA_samples <span class="ot">=</span> modelCFA_stan<span class="sc">$</span><span class="fu">sample</span>(</span>
-<span id="cb6-2"><a href=""></a>  <span class="at">data =</span> modelCFA_data,</span>
-<span id="cb6-3"><a href=""></a>  <span class="at">seed =</span> <span class="dv">09102022</span>,</span>
-<span id="cb6-4"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
-<span id="cb6-5"><a href=""></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
-<span id="cb6-6"><a href=""></a>  <span class="at">iter_warmup =</span> <span class="dv">1000</span>,</span>
-<span id="cb6-7"><a href=""></a>  <span class="at">iter_sampling =</span> <span class="dv">2000</span></span>
-<span id="cb6-8"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>modelCFA_samples <span class="ot">=</span> modelCFA_stan<span class="sc">$</span><span class="fu">sample</span>(</span>
+<span id="cb5-2"><a href=""></a>  <span class="at">data =</span> modelCFA_data,</span>
+<span id="cb5-3"><a href=""></a>  <span class="at">seed =</span> <span class="dv">09102022</span>,</span>
+<span id="cb5-4"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb5-5"><a href=""></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
+<span id="cb5-6"><a href=""></a>  <span class="at">iter_warmup =</span> <span class="dv">2000</span>,</span>
+<span id="cb5-7"><a href=""></a>  <span class="at">iter_sampling =</span> <span class="dv">2000</span>,</span>
+<span id="cb5-8"><a href=""></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">lambda=</span><span class="fu">rnorm</span>(nItems, <span class="at">mean=</span><span class="dv">10</span>, <span class="at">sd=</span><span class="dv">2</span>),</span>
+<span id="cb5-9"><a href=""></a>                         <span class="at">theta=</span><span class="fu">rnorm</span>(nObs, <span class="at">mean=</span>initTheta, <span class="at">sd=</span><span class="dv">0</span>))</span>
+<span id="cb5-10"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Note: Typically, longer chains are needed for larger models like this
 <ul>
 <li>These will become even longer when we use non-normal distributions for observed data</li>
+</ul></li>
+</ul>
+</section>
+<section id="stans-init-option" class="slide level2">
+<h2>Stan’s <code>init</code> Option</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>  init <span class="ot">=</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">lambda=</span><span class="fu">rnorm</span>(nItems, <span class="at">mean=</span><span class="dv">10</span>, <span class="at">sd=</span><span class="dv">2</span>),</span>
+<span id="cb6-2"><a href=""></a>                         <span class="at">theta=</span><span class="fu">rnorm</span>(nObs, <span class="at">mean=</span>initTheta, <span class="at">sd=</span><span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>The <code>init</code> option is used to set starting values for the parameters
+<ul>
+<li>This is especially important for the item discrimination parameters <span class="math inline">\(\lambda_i\)</span> and the latent variables <span class="math inline">\(\theta_p\)</span></li>
+</ul></li>
+<li>This code tells Stan to sample starting values for <span class="math inline">\(\lambda_i\)</span> from a normal distribution with mean 10 and standard deviation 2
+<ul>
+<li>This ensures starting values for <span class="math inline">\(\lambda_i\)</span> will most likely be positive</li>
+</ul></li>
+<li>For <span class="math inline">\(\theta_p\)</span>, we will need more work…</li>
+</ul>
+</section>
+<section id="initializing-latent-variables" class="slide level2">
+<h2>Initializing Latent Variables</h2>
+<ul>
+<li><p>As we expect the latent variable to be highly related to the sum score, we can use the sum score to help us initialize <span class="math inline">\(\theta_p\)</span> so we end up in the correct mode of the posterior distribution</p></li>
+<li><p>We will use the standardized sum score as a starting value for <span class="math inline">\(\theta_p\)</span> (starting value denoted <span class="math inline">\(\theta_p^*\)</span>)</p></li>
+</ul>
+<p><span class="math display">\[\theta_{p}^* = \frac{\sum_{i=1}^I Y_{pi} - \text{mean}\left({\sum_{i=1}^I Y_{pi}}\right)}{\text{sd}\left({\sum_{i=1}^I Y_{pi}}\right)}\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="co"># create standardized sum scores for latent variable initialization values</span></span>
+<span id="cb7-2"><a href=""></a>sumScores <span class="ot">=</span> <span class="fu">rowSums</span>(conspiracyItems)</span>
+<span id="cb7-3"><a href=""></a>initTheta <span class="ot">=</span> (sumScores <span class="sc">-</span> <span class="fu">mean</span>(sumScores))<span class="sc">/</span><span class="fu">sd</span>(sumScores)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>We will use the standardized sum score as the starting value for <span class="math inline">\(\theta_p\)</span> in the <code>init</code> option
+<ul>
+<li>In my example, I set the standard deviation of the normal distribution to zero (meaning the function just returns the mean) – you can also choose to make this a small value allowing for some variability</li>
 </ul></li>
 </ul>
 </section>
@@ -794,7 +828,7 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 </ul>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.530704</code></pre>
+<pre><code>[1] 1.005758</code></pre>
 </div>
 </div>
 <ul>
@@ -803,38 +837,38 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 30 × 10
-   variable    mean median     sd    mad     q5   q95  rhat ess_bulk ess_tail
-   &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
- 1 mu[1]      2.37   2.37  0.0865 0.0862  2.23  2.51   1.00  1501.     2931. 
- 2 mu[2]      1.95   1.95  0.0851 0.0862  1.81  2.09   1.00  1115.     1986. 
- 3 mu[3]      1.88   1.88  0.0843 0.0842  1.74  2.01   1.00  1369.     3128. 
- 4 mu[4]      2.01   2.01  0.0839 0.0835  1.87  2.15   1.00  1158.     2449. 
- 5 mu[5]      1.98   1.98  0.0844 0.0855  1.85  2.12   1.00   875.     1774. 
- 6 mu[6]      1.89   1.89  0.0765 0.0768  1.77  2.02   1.00   891.     1703. 
- 7 mu[7]      1.72   1.72  0.0756 0.0764  1.60  1.85   1.00  1190.     2494. 
- 8 mu[8]      1.84   1.84  0.0723 0.0720  1.72  1.96   1.00   920.     2146. 
- 9 mu[9]      1.81   1.81  0.0859 0.0839  1.67  1.95   1.00  1213.     2550. 
-10 mu[10]     1.52   1.52  0.0807 0.0818  1.39  1.65   1.00  1635.     2991. 
-11 lambda[1]  0.369  0.699 0.643  0.127  -0.799 0.863  1.53     7.14     27.0
-12 lambda[2]  0.434  0.833 0.756  0.117  -0.932 0.988  1.53     7.14     28.6
-13 lambda[3]  0.401  0.766 0.697  0.118  -0.863 0.921  1.53     7.15     27.5
-14 lambda[4]  0.421  0.807 0.733  0.115  -0.905 0.961  1.53     7.15     29.5
-15 lambda[5]  0.497  0.961 0.864  0.107  -1.05  1.11   1.53     7.18     31.8
-16 lambda[6]  0.449  0.867 0.779  0.0964 -0.950 0.997  1.53     7.21     32.0
-17 lambda[7]  0.381  0.732 0.664  0.104  -0.818 0.870  1.53     7.15     29.5
-18 lambda[8]  0.425  0.823 0.740  0.0941 -0.900 0.947  1.53     7.19     28.7
-19 lambda[9]  0.430  0.822 0.747  0.121  -0.928 0.978  1.53     7.15     26.9
-20 lambda[10] 0.336  0.635 0.585  0.118  -0.731 0.791  1.53     7.13     27.9
-21 psi[1]     0.892  0.889 0.0502 0.0496  0.814 0.977  1.00 13975.     5941. 
-22 psi[2]     0.734  0.733 0.0444 0.0435  0.664 0.810  1.00 11949.     6087. 
-23 psi[3]     0.781  0.780 0.0451 0.0439  0.710 0.858  1.00 12284.     5946. 
-24 psi[4]     0.757  0.754 0.0439 0.0442  0.688 0.832  1.00 13409.     6325. 
-25 psi[5]     0.545  0.544 0.0368 0.0364  0.486 0.607  1.00  8859.     6515. 
-26 psi[6]     0.505  0.504 0.0343 0.0339  0.452 0.563  1.00  9669.     6941. 
-27 psi[7]     0.686  0.684 0.0402 0.0401  0.623 0.755  1.00 14073.     6354. 
-28 psi[8]     0.480  0.479 0.0320 0.0318  0.430 0.534  1.00  9692.     6887. 
-29 psi[9]     0.782  0.781 0.0454 0.0452  0.711 0.860  1.00 13291.     5775. 
-30 psi[10]    0.840  0.838 0.0473 0.0473  0.766 0.921  1.00 15918.     6509. </code></pre>
+   variable    mean median     sd    mad    q5   q95  rhat ess_bulk ess_tail
+   &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+ 1 mu[1]      2.37   2.37  0.0862 0.0863 2.23  2.51   1.00    1369.    2860.
+ 2 mu[2]      1.96   1.96  0.0840 0.0832 1.82  2.09   1.00     975.    2023.
+ 3 mu[3]      1.88   1.88  0.0842 0.0816 1.74  2.02   1.00    1103.    2563.
+ 4 mu[4]      2.01   2.01  0.0838 0.0824 1.87  2.15   1.00    1050.    2438.
+ 5 mu[5]      1.98   1.98  0.0840 0.0847 1.85  2.12   1.00     759.    1309.
+ 6 mu[6]      1.89   1.90  0.0754 0.0747 1.77  2.02   1.00     773.    1532.
+ 7 mu[7]      1.72   1.73  0.0759 0.0758 1.60  1.85   1.00    1108.    2316.
+ 8 mu[8]      1.84   1.84  0.0716 0.0707 1.73  1.96   1.00     759.    1476.
+ 9 mu[9]      1.81   1.81  0.0867 0.0858 1.66  1.95   1.00    1055.    2163.
+10 mu[10]     1.52   1.52  0.0814 0.0814 1.39  1.65   1.00    1414.    3088.
+11 lambda[1]  0.739  0.738 0.0825 0.0812 0.607 0.877  1.00    2492.    4852.
+12 lambda[2]  0.871  0.870 0.0778 0.0775 0.746 1.00   1.00    1692.    3480.
+13 lambda[3]  0.804  0.802 0.0779 0.0774 0.677 0.932  1.00    2056.    3944.
+14 lambda[4]  0.844  0.842 0.0774 0.0776 0.721 0.974  1.00    1716.    3324.
+15 lambda[5]  0.999  0.996 0.0723 0.0726 0.883 1.12   1.01    1126.    2516.
+16 lambda[6]  0.900  0.896 0.0657 0.0675 0.797 1.01   1.00    1111.    2967.
+17 lambda[7]  0.765  0.763 0.0702 0.0700 0.653 0.884  1.00    1731.    3725.
+18 lambda[8]  0.854  0.853 0.0617 0.0631 0.756 0.958  1.00    1102.    2455.
+19 lambda[9]  0.862  0.861 0.0801 0.0801 0.734 0.995  1.00    1767.    3832.
+20 lambda[10] 0.673  0.671 0.0774 0.0767 0.548 0.800  1.00    2536.    4138.
+21 psi[1]     0.891  0.888 0.0518 0.0517 0.810 0.980  1.00   15383.    5995.
+22 psi[2]     0.734  0.732 0.0429 0.0431 0.667 0.808  1.00   12105.    6396.
+23 psi[3]     0.783  0.781 0.0442 0.0439 0.714 0.857  1.00   15176.    6273.
+24 psi[4]     0.758  0.756 0.0438 0.0431 0.689 0.834  1.00   13862.    5865.
+25 psi[5]     0.545  0.543 0.0371 0.0362 0.487 0.610  1.00    9358.    6936.
+26 psi[6]     0.505  0.504 0.0332 0.0334 0.452 0.562  1.00    8442.    6312.
+27 psi[7]     0.687  0.685 0.0401 0.0399 0.624 0.755  1.00   14397.    6500.
+28 psi[8]     0.480  0.479 0.0318 0.0319 0.429 0.534  1.00    9040.    6473.
+29 psi[9]     0.782  0.780 0.0452 0.0443 0.711 0.860  1.00   14683.    6355.
+30 psi[10]    0.840  0.838 0.0469 0.0468 0.766 0.920  1.00   15456.    5393.</code></pre>
 </div>
 </div>
 </section>
@@ -873,7 +907,7 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <section id="posterior-icc-plots" class="slide level2">
 <h2>Posterior ICC Plots</h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-15-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-16-1.png" width="960" class="r-stretch"></section>
 <section id="posterior-distribution-for-item-parameters" class="slide level2">
 <h2>Posterior Distribution for Item Parameters</h2>
 <p>Before moving onto the latent variables, let’s note the posterior distribution of the item parameters (for a single item):</p>
@@ -895,212 +929,213 @@ f\left(\mu_i, \lambda_i, \psi_i \right)
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 177 × 10
-    variable      mean   median    sd   mad     q5   q95  rhat ess_bulk ess_tail
-    &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-  1 theta[1]   0.00733  8.16e-3 0.248 0.249 -0.402 0.411  1.00  5797.     6152. 
-  2 theta[2]   0.768    1.42e+0 1.35  0.405 -1.75  1.94   1.53     7.11     26.8
-  3 theta[3]   0.853    1.59e+0 1.50  0.419 -1.94  2.11   1.53     7.13     27.5
-  4 theta[4]  -0.465   -8.22e-1 0.846 0.395 -1.32  1.14   1.53     7.13     27.2
-  5 theta[5]   0.0211   2.07e-2 0.244 0.243 -0.382 0.422  1.01   309.     5112. 
-  6 theta[6]  -0.492   -8.69e-1 0.882 0.399 -1.36  1.17   1.53     7.10     25.7
-  7 theta[7]  -0.170   -2.36e-1 0.385 0.371 -0.711 0.548  1.45     7.76     26.5
-  8 theta[8]  -0.0266  -2.70e-2 0.253 0.251 -0.447 0.388  1.02   160.     4022. 
-  9 theta[9]  -0.393   -6.84e-1 0.725 0.380 -1.15  0.997  1.53     7.12     27.1
- 10 theta[10]  0.0209   1.73e-2 0.243 0.239 -0.373 0.424  1.01   274.     4676. 
- 11 theta[11] -0.488   -8.68e-1 0.887 0.391 -1.35  1.21   1.53     7.10     27.2
- 12 theta[12]  0.128    1.50e-1 0.329 0.326 -0.460 0.631  1.33     9.38     29.4
- 13 theta[13] -0.375   -6.41e-1 0.695 0.379 -1.12  0.958  1.53     7.11     28.1
- 14 theta[14] -0.488   -8.72e-1 0.888 0.386 -1.36  1.19   1.53     7.10     26.3
- 15 theta[15] -0.419   -7.31e-1 0.769 0.388 -1.21  1.05   1.53     7.11     27.6
- 16 theta[16] -0.0292  -2.89e-2 0.251 0.252 -0.443 0.383  1.03    87.6    4604. 
- 17 theta[17] -0.0324  -3.29e-2 0.256 0.258 -0.445 0.389  1.03   103.     3499. 
- 18 theta[18] -0.330   -5.54e-1 0.628 0.389 -1.05  0.860  1.53     7.10     28.1
- 19 theta[19]  0.934    1.75e+0 1.64  0.415 -2.10  2.28   1.53     7.14     26.5
- 20 theta[20] -0.465   -8.23e-1 0.844 0.391 -1.31  1.13   1.53     7.11     27.2
- 21 theta[21] -0.125   -1.61e-1 0.328 0.322 -0.617 0.472  1.33     9.36     30.2
- 22 theta[22] -0.490   -8.74e-1 0.887 0.387 -1.36  1.19   1.53     7.08     26.2
- 23 theta[23] -0.490   -8.74e-1 0.889 0.397 -1.35  1.20   1.53     7.11     26.4
- 24 theta[24] -0.489   -8.67e-1 0.887 0.399 -1.37  1.19   1.53     7.11     26.4
- 25 theta[25]  0.271    4.26e-1 0.532 0.395 -0.746 0.931  1.52     7.13     26.4
- 26 theta[26]  0.370    6.21e-1 0.683 0.398 -0.942 1.12   1.53     7.10     27.1
- 27 theta[27] -0.0576  -6.36e-2 0.272 0.270 -0.498 0.396  1.09    29.1      98.5
- 28 theta[28]  0.604    1.10e+0 1.08  0.391 -1.42  1.59   1.53     7.11     26.5
- 29 theta[29]  0.446    7.80e-1 0.814 0.400 -1.11  1.28   1.53     7.11     26.7
- 30 theta[30]  0.840    1.56e+0 1.48  0.422 -1.91  2.09   1.53     7.12     26.8
- 31 theta[31]  0.274    4.35e-1 0.535 0.399 -0.756 0.924  1.52     7.14     27.4
- 32 theta[32] -0.210   -3.10e-1 0.446 0.386 -0.804 0.630  1.50     7.34     26.7
- 33 theta[33]  0.162    2.18e-1 0.374 0.358 -0.540 0.699  1.42     8.12     26.7
- 34 theta[34] -0.490   -8.74e-1 0.887 0.389 -1.35  1.20   1.53     7.11     26.7
- 35 theta[35] -0.333   -5.62e-1 0.631 0.381 -1.04  0.876  1.53     7.10     29.1
- 36 theta[36] -0.395   -6.88e-1 0.734 0.384 -1.17  1.01   1.53     7.09     26.5
- 37 theta[37] -0.492   -8.74e-1 0.888 0.388 -1.37  1.19   1.53     7.11     26.7
- 38 theta[38] -0.107   -1.25e-1 0.313 0.314 -0.584 0.436  1.27    10.8      33.2
- 39 theta[39] -0.491   -8.77e-1 0.886 0.386 -1.35  1.20   1.53     7.12     26.8
- 40 theta[40]  0.0230   2.21e-2 0.247 0.243 -0.382 0.437  1.01   302.     3971. 
- 41 theta[41] -0.491   -8.74e-1 0.887 0.383 -1.36  1.19   1.53     7.11     26.8
- 42 theta[42] -0.0435  -4.57e-2 0.266 0.264 -0.478 0.407  1.05    49.9     352. 
- 43 theta[43] -0.322   -5.35e-1 0.615 0.398 -1.03  0.861  1.53     7.09     27.8
- 44 theta[44] -0.0292  -3.12e-2 0.252 0.249 -0.431 0.393  1.03    92.2    3590. 
- 45 theta[45]  0.189    2.69e-1 0.413 0.389 -0.583 0.751  1.48     7.53     26.7
- 46 theta[46]  0.132    1.68e-1 0.339 0.332 -0.500 0.636  1.36     8.98     30.5
- 47 theta[47]  0.250    3.94e-1 0.501 0.386 -0.709 0.884  1.52     7.16     27.9
- 48 theta[48] -0.416   -7.24e-1 0.770 0.395 -1.22  1.06   1.53     7.09     26.4
- 49 theta[49] -0.491   -8.72e-1 0.886 0.379 -1.36  1.19   1.53     7.09     27.5
- 50 theta[50]  0.0774   8.79e-2 0.296 0.298 -0.429 0.549  1.15    17.3      49.8
- 51 theta[51] -0.488   -8.69e-1 0.890 0.400 -1.37  1.19   1.53     7.11     28.5
- 52 theta[52]  0.161    2.20e-1 0.374 0.357 -0.536 0.697  1.43     8.04     25.6
- 53 theta[53] -0.488   -8.71e-1 0.885 0.389 -1.35  1.19   1.53     7.12     26.7
- 54 theta[54]  0.608    1.10e+0 1.08  0.388 -1.42  1.59   1.53     7.13     27.5
- 55 theta[55] -0.492   -8.73e-1 0.884 0.392 -1.36  1.18   1.53     7.11     29.2
- 56 theta[56] -0.489   -8.76e-1 0.886 0.376 -1.34  1.19   1.53     7.10     28.0
- 57 theta[57] -0.366   -6.21e-1 0.689 0.397 -1.13  0.948  1.53     7.09     27.3
- 58 theta[58] -0.489   -8.67e-1 0.888 0.397 -1.36  1.19   1.53     7.11     27.7
- 59 theta[59] -0.0334  -3.62e-2 0.256 0.258 -0.446 0.392  1.04    71.7     329. 
- 60 theta[60] -0.324   -5.41e-1 0.612 0.386 -1.01  0.863  1.53     7.11     27.0
- 61 theta[61]  0.694    1.27e+0 1.22  0.403 -1.60  1.78   1.53     7.13     27.6
- 62 theta[62]  0.162    2.24e-1 0.374 0.354 -0.535 0.700  1.43     8.01     28.5
- 63 theta[63] -0.491   -8.73e-1 0.886 0.385 -1.36  1.19   1.53     7.11     26.2
- 64 theta[64]  0.684    1.26e+0 1.22  0.399 -1.60  1.76   1.53     7.15     27.8
- 65 theta[65]  0.605    1.10e+0 1.08  0.395 -1.43  1.59   1.53     7.12     28.1
- 66 theta[66] -0.375   -6.42e-1 0.700 0.398 -1.13  0.964  1.53     7.09     27.2
- 67 theta[67]  0.271    4.30e-1 0.536 0.405 -0.763 0.925  1.52     7.14     26.6
- 68 theta[68]  0.426    7.48e-1 0.786 0.385 -1.08  1.24   1.53     7.14     27.2
- 69 theta[69] -0.266   -4.23e-1 0.527 0.395 -0.917 0.739  1.52     7.13     27.3
- 70 theta[70]  0.444    7.79e-1 0.813 0.395 -1.11  1.27   1.53     7.12     28.9
- 71 theta[71]  0.0362   3.55e-2 0.251 0.252 -0.375 0.450  1.03   102.     4065. 
- 72 theta[72]  0.523    9.39e-1 0.949 0.400 -1.28  1.44   1.53     7.14     26.7
- 73 theta[73] -0.0108  -1.09e-2 0.244 0.244 -0.415 0.392  1.00  5018.     4638. 
- 74 theta[74] -0.491   -8.76e-1 0.885 0.388 -1.35  1.20   1.53     7.10     25.7
- 75 theta[75] -0.490   -8.69e-1 0.887 0.403 -1.36  1.20   1.53     7.10     27.9
- 76 theta[76]  1.63     3.13e+0 2.84  0.466 -3.52  3.70   1.53     7.18     29.7
- 77 theta[77] -0.395   -6.80e-1 0.729 0.387 -1.16  1.02   1.53     7.11     27.8
- 78 theta[78]  0.576    1.04e+0 1.03  0.393 -1.37  1.54   1.53     7.13     26.1
- 79 theta[79]  0.937    1.75e+0 1.64  0.418 -2.10  2.28   1.53     7.11     29.5
- 80 theta[80]  0.305    4.99e-1 0.586 0.398 -0.821 0.993  1.53     7.11     27.3
- 81 theta[81]  0.0210   1.93e-2 0.252 0.252 -0.391 0.439  1.02   204.     4812. 
- 82 theta[82]  0.0104   9.84e-3 0.252 0.251 -0.409 0.427  1.00  5100.     4938. 
- 83 theta[83] -0.490   -8.74e-1 0.888 0.388 -1.35  1.19   1.53     7.09     28.2
- 84 theta[84]  0.790    1.46e+0 1.39  0.406 -1.80  1.98   1.53     7.12     26.3
- 85 theta[85]  0.105    1.22e-1 0.305 0.304 -0.422 0.576  1.25    11.4      36.8
- 86 theta[86] -0.490   -8.76e-1 0.884 0.387 -1.35  1.17   1.53     7.13     27.8
- 87 theta[87]  0.0871   9.95e-2 0.283 0.282 -0.398 0.531  1.18    15.0      46.8
- 88 theta[88] -0.160   -2.14e-1 0.372 0.361 -0.684 0.523  1.43     7.97     28.2
- 89 theta[89] -0.492   -8.76e-1 0.888 0.386 -1.38  1.19   1.53     7.10     26.7
- 90 theta[90]  0.420    7.24e-1 0.768 0.395 -1.04  1.23   1.53     7.10     27.4
- 91 theta[91] -0.418   -7.32e-1 0.769 0.386 -1.20  1.06   1.53     7.10     28.4
- 92 theta[92]  0.529    9.49e-1 0.954 0.407 -1.28  1.45   1.53     7.12     27.3
- 93 theta[93]  0.00947  7.25e-3 0.252 0.252 -0.407 0.429  1.00  5003.     5061. 
- 94 theta[94]  1.30     2.47e+0 2.27  0.448 -2.84  3.02   1.53     7.14     27.5
- 95 theta[95]  0.829    1.54e+0 1.46  0.415 -1.90  2.05   1.53     7.11     27.4
- 96 theta[96]  0.161    2.17e-1 0.368 0.359 -0.514 0.688  1.44     7.88     29.8
- 97 theta[97]  0.135    1.77e-1 0.339 0.330 -0.489 0.631  1.35     9.03     29.3
- 98 theta[98] -0.488   -8.72e-1 0.887 0.394 -1.36  1.20   1.53     7.09     27.5
- 99 theta[99]  0.608    1.10e+0 1.08  0.397 -1.43  1.60   1.53     7.12     28.7
-100 theta[10… -0.465   -8.23e-1 0.843 0.376 -1.29  1.14   1.53     7.10     26.9
-101 theta[10… -0.351   -5.98e-1 0.662 0.382 -1.07  0.925  1.53     7.11     27.5
-102 theta[10…  1.41     2.69e+0 2.45  0.456 -3.06  3.25   1.53     7.15     27.3
-103 theta[10… -0.332   -5.59e-1 0.633 0.387 -1.04  0.883  1.53     7.14     26.5
-104 theta[10…  0.428    7.40e-1 0.790 0.415 -1.08  1.26   1.53     7.11     28.3
-105 theta[10… -0.0423  -4.70e-2 0.272 0.268 -0.480 0.419  1.05    53.6     557. 
-106 theta[10…  0.565    1.02e+0 1.01  0.402 -1.33  1.52   1.53     7.14     28.9
-107 theta[10…  0.793    1.47e+0 1.39  0.402 -1.80  1.98   1.53     7.11     27.2
-108 theta[10…  0.421    7.33e-1 0.765 0.382 -1.04  1.21   1.53     7.11     27.8
-109 theta[10…  0.516    9.19e-1 0.932 0.405 -1.24  1.42   1.53     7.12     28.1
-110 theta[11…  0.0214   2.35e-2 0.248 0.248 -0.385 0.432  1.01   376.     4176. 
-111 theta[11…  0.0557   5.94e-2 0.268 0.267 -0.393 0.488  1.09    28.8      99.4
-112 theta[11… -0.324   -5.40e-1 0.609 0.383 -1.02  0.839  1.53     7.10     27.2
-113 theta[11…  0.186    2.70e-1 0.405 0.371 -0.583 0.740  1.48     7.49     27.5
-114 theta[11… -0.158   -2.15e-1 0.371 0.354 -0.685 0.536  1.43     8.02     29.7
-115 theta[11…  0.431    7.45e-1 0.789 0.407 -1.07  1.26   1.53     7.09     29.2
-116 theta[11… -0.0865  -9.56e-2 0.282 0.284 -0.540 0.394  1.19    14.2      45.8
-117 theta[11…  0.0323   3.68e-2 0.252 0.252 -0.391 0.450  1.03    91.4    3091. 
-118 theta[11…  0.161    2.20e-1 0.370 0.352 -0.529 0.687  1.43     7.98     26.8
-119 theta[11… -0.416   -7.34e-1 0.763 0.370 -1.20  1.03   1.53     7.11     28.1
-120 theta[12… -0.488   -8.69e-1 0.885 0.388 -1.35  1.19   1.53     7.10     28.7
-121 theta[12…  0.106    1.23e-1 0.314 0.317 -0.429 0.599  1.23    12.4      40.7
-122 theta[12… -0.321   -5.35e-1 0.611 0.395 -1.02  0.854  1.53     7.11     26.0
-123 theta[12…  0.607    1.10e+0 1.08  0.396 -1.42  1.59   1.53     7.10     27.7
-124 theta[12…  0.520    9.21e-1 0.931 0.399 -1.23  1.42   1.53     7.13     26.7
-125 theta[12… -0.489   -8.71e-1 0.889 0.390 -1.36  1.20   1.53     7.10     27.2
-126 theta[12… -0.323   -5.37e-1 0.611 0.397 -1.02  0.840  1.53     7.10     26.9
-127 theta[12…  0.565    1.02e+0 1.01  0.394 -1.34  1.51   1.53     7.16     27.5
-128 theta[12… -0.424   -7.36e-1 0.775 0.395 -1.22  1.05   1.53     7.09     28.0
-129 theta[12… -0.331   -5.54e-1 0.633 0.392 -1.04  0.882  1.53     7.11     26.9
-130 theta[13…  0.933    1.75e+0 1.64  0.415 -2.10  2.27   1.53     7.12     27.7
-131 theta[13… -0.169   -2.32e-1 0.388 0.360 -0.713 0.558  1.43     7.93     26.8
-132 theta[13…  0.830    1.54e+0 1.46  0.427 -1.88  2.07   1.53     7.10     27.0
-133 theta[13… -0.491   -8.78e-1 0.891 0.387 -1.36  1.20   1.53     7.11     26.4
-134 theta[13…  1.30     2.48e+0 2.27  0.444 -2.83  3.01   1.53     7.14     28.0
-135 theta[13… -0.394   -6.86e-1 0.732 0.388 -1.16  0.999  1.53     7.09     26.4
-136 theta[13… -0.489   -8.69e-1 0.887 0.391 -1.36  1.19   1.53     7.10     26.3
-137 theta[13…  0.386    6.66e-1 0.719 0.386 -1.00  1.15   1.53     7.11     27.0
-138 theta[13… -0.394   -6.79e-1 0.726 0.393 -1.16  0.986  1.53     7.09     26.3
-139 theta[13…  0.0245   2.31e-2 0.253 0.252 -0.389 0.447  1.01   312.     5577. 
-140 theta[14… -0.0232  -1.86e-2 0.251 0.255 -0.445 0.381  1.02   149.     2780. 
-141 theta[14… -0.420   -7.29e-1 0.771 0.394 -1.21  1.04   1.53     7.10     26.9
-142 theta[14… -0.489   -8.71e-1 0.887 0.391 -1.35  1.19   1.53     7.11     26.0
-143 theta[14… -0.488   -8.74e-1 0.886 0.377 -1.34  1.19   1.53     7.14     27.0
-144 theta[14…  0.410    7.08e-1 0.750 0.399 -1.03  1.19   1.53     7.12     27.8
-145 theta[14… -0.490   -8.76e-1 0.892 0.392 -1.36  1.21   1.53     7.12     27.1
-146 theta[14…  0.310    5.04e-1 0.586 0.397 -0.818 1.00   1.53     7.11     26.1
-147 theta[14…  0.428    7.45e-1 0.783 0.393 -1.08  1.23   1.53     7.09     26.7
-148 theta[14…  0.0603   6.32e-2 0.270 0.272 -0.386 0.509  1.09    26.3     142. 
-149 theta[14… -0.491   -8.75e-1 0.890 0.390 -1.36  1.20   1.53     7.11     27.0
-150 theta[15… -0.489   -8.75e-1 0.887 0.380 -1.35  1.20   1.53     7.09     26.8
-151 theta[15… -0.320   -5.34e-1 0.613 0.390 -1.01  0.858  1.53     7.10     28.1
-152 theta[15… -0.490   -8.75e-1 0.886 0.383 -1.35  1.20   1.53     7.11     26.9
-153 theta[15…  0.766    1.41e+0 1.34  0.417 -1.73  1.92   1.53     7.13     27.0
-154 theta[15… -0.462   -8.15e-1 0.844 0.403 -1.30  1.16   1.53     7.10     27.2
-155 theta[15… -0.489   -8.73e-1 0.888 0.393 -1.37  1.19   1.53     7.10     27.6
-156 theta[15… -0.416   -7.23e-1 0.768 0.389 -1.21  1.06   1.53     7.10     28.8
-157 theta[15… -0.417   -7.23e-1 0.770 0.405 -1.22  1.06   1.53     7.10     27.4
-158 theta[15… -0.00452 -4.36e-5 0.244 0.244 -0.403 0.388  1.00  5737.     5235. 
-159 theta[15…  0.306    5.00e-1 0.584 0.392 -0.825 0.985  1.53     7.11     26.7
-160 theta[16… -0.491   -8.73e-1 0.889 0.390 -1.37  1.19   1.53     7.11     29.8
-161 theta[16…  0.650    1.19e+0 1.15  0.402 -1.52  1.69   1.53     7.12     26.3
-162 theta[16…  0.0837   9.15e-2 0.288 0.290 -0.400 0.547  1.18    15.0      49.7
-163 theta[16… -0.494   -8.74e-1 0.886 0.397 -1.36  1.19   1.53     7.12     28.2
-164 theta[16… -0.268   -4.28e-1 0.534 0.391 -0.913 0.749  1.52     7.13     28.1
-165 theta[16…  0.0831   9.25e-2 0.287 0.286 -0.401 0.545  1.16    16.5      46.7
-166 theta[16… -0.489   -8.74e-1 0.890 0.399 -1.36  1.19   1.53     7.10     28.6
-167 theta[16…  0.163    2.19e-1 0.372 0.364 -0.521 0.699  1.43     8.01     27.0
-168 theta[16…  0.692    1.26e+0 1.22  0.407 -1.59  1.77   1.53     7.11     28.0
-169 theta[16… -0.177   -2.47e-1 0.398 0.365 -0.733 0.576  1.45     7.73     27.3
-170 theta[17…  0.0579   5.92e-2 0.267 0.268 -0.385 0.492  1.09    28.7     131. 
-171 theta[17… -0.371   -6.40e-1 0.699 0.379 -1.12  0.978  1.53     7.11     26.4
-172 theta[17…  0.103    1.18e-1 0.304 0.300 -0.429 0.578  1.23    12.2      34.7
-173 theta[17…  0.305    5.07e-1 0.586 0.381 -0.831 0.976  1.53     7.13     28.1
-174 theta[17… -0.351   -5.96e-1 0.664 0.390 -1.08  0.912  1.53     7.09     26.2
-175 theta[17… -0.333   -5.57e-1 0.626 0.388 -1.04  0.868  1.53     7.13     26.6
-176 theta[17… -0.392   -6.85e-1 0.726 0.381 -1.15  1.00   1.53     7.11     30.8
-177 theta[17… -0.220   -3.32e-1 0.457 0.383 -0.811 0.659  1.50     7.27     26.3</code></pre>
+    variable      mean  median    sd   mad      q5      q95  rhat ess_bulk
+    &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+  1 theta[1]    0.0149  0.0176 0.249 0.249 -0.399   0.425    1.00    5825.
+  2 theta[2]    1.52    1.52   0.260 0.261  1.10    1.96     1.00    4026.
+  3 theta[3]    1.70    1.69   0.262 0.265  1.28    2.14     1.00    3119.
+  4 theta[4]   -0.930  -0.924  0.250 0.250 -1.34   -0.529    1.00    4175.
+  5 theta[5]    0.0402  0.0388 0.248 0.249 -0.364   0.449    1.00    5522.
+  6 theta[6]   -0.982  -0.983  0.244 0.246 -1.39   -0.585    1.00    3629.
+  7 theta[7]   -0.340  -0.339  0.250 0.251 -0.752   0.0644   1.00    4861.
+  8 theta[8]   -0.0576 -0.0579 0.251 0.246 -0.473   0.357    1.00    5262.
+  9 theta[9]   -0.791  -0.789  0.247 0.245 -1.20   -0.392    1.00    4166.
+ 10 theta[10]   0.0404  0.0399 0.243 0.247 -0.358   0.435    1.00    4842.
+ 11 theta[11]  -0.984  -0.982  0.250 0.247 -1.40   -0.580    1.00    3779.
+ 12 theta[12]   0.252   0.250  0.246 0.247 -0.147   0.661    1.00    4963.
+ 13 theta[13]  -0.751  -0.748  0.251 0.247 -1.17   -0.349    1.00    4498.
+ 14 theta[14]  -0.982  -0.979  0.251 0.246 -1.40   -0.583    1.00    3831.
+ 15 theta[15]  -0.841  -0.837  0.247 0.246 -1.26   -0.442    1.00    4289.
+ 16 theta[16]  -0.0692 -0.0707 0.249 0.244 -0.478   0.347    1.00    5734.
+ 17 theta[17]  -0.0684 -0.0688 0.245 0.242 -0.467   0.333    1.00    4837.
+ 18 theta[18]  -0.668  -0.669  0.251 0.253 -1.08   -0.259    1.00    4203.
+ 19 theta[19]   1.86    1.86   0.274 0.274  1.41    2.32     1.00    3063.
+ 20 theta[20]  -0.929  -0.926  0.248 0.250 -1.34   -0.519    1.00    4091.
+ 21 theta[21]  -0.256  -0.255  0.243 0.234 -0.660   0.143    1.00    4999.
+ 22 theta[22]  -0.981  -0.980  0.251 0.250 -1.39   -0.575    1.00    4520.
+ 23 theta[23]  -0.980  -0.979  0.254 0.251 -1.41   -0.574    1.00    3956.
+ 24 theta[24]  -0.979  -0.975  0.254 0.252 -1.40   -0.563    1.00    3853.
+ 25 theta[25]   0.540   0.537  0.252 0.250  0.129   0.953    1.00    5490.
+ 26 theta[26]   0.730   0.728  0.253 0.245  0.322   1.15     1.00    4504.
+ 27 theta[27]  -0.118  -0.120  0.252 0.256 -0.533   0.290    1.00    4609.
+ 28 theta[28]   1.21    1.20   0.247 0.249  0.807   1.62     1.00    3842.
+ 29 theta[29]   0.886   0.885  0.247 0.247  0.480   1.30     1.00    4142.
+ 30 theta[30]   1.67    1.67   0.266 0.263  1.24    2.12     1.00    3570.
+ 31 theta[31]   0.538   0.538  0.249 0.239  0.128   0.950    1.00    4646.
+ 32 theta[32]  -0.418  -0.416  0.255 0.250 -0.842   0.00117  1.00    5898.
+ 33 theta[33]   0.318   0.316  0.245 0.244 -0.0737  0.725    1.00    5098.
+ 34 theta[34]  -0.981  -0.978  0.246 0.245 -1.38   -0.576    1.00    3805.
+ 35 theta[35]  -0.668  -0.666  0.254 0.255 -1.09   -0.257    1.00    5079.
+ 36 theta[36]  -0.796  -0.796  0.245 0.244 -1.20   -0.399    1.00    4946.
+ 37 theta[37]  -0.983  -0.985  0.246 0.245 -1.39   -0.577    1.00    3900.
+ 38 theta[38]  -0.220  -0.223  0.251 0.244 -0.633   0.201    1.00    5376.
+ 39 theta[39]  -0.983  -0.983  0.256 0.253 -1.40   -0.561    1.00    4032.
+ 40 theta[40]   0.0409  0.0390 0.244 0.243 -0.363   0.446    1.00    6828.
+ 41 theta[41]  -0.982  -0.977  0.253 0.249 -1.40   -0.571    1.00    3616.
+ 42 theta[42]  -0.0907 -0.0887 0.250 0.252 -0.500   0.309    1.00    5692.
+ 43 theta[43]  -0.647  -0.645  0.244 0.252 -1.05   -0.252    1.00    4414.
+ 44 theta[44]  -0.0711 -0.0723 0.246 0.239 -0.473   0.338    1.00    5027.
+ 45 theta[45]   0.376   0.378  0.248 0.247 -0.0402  0.782    1.00    5562.
+ 46 theta[46]   0.262   0.264  0.245 0.242 -0.141   0.667    1.00    6349.
+ 47 theta[47]   0.502   0.500  0.253 0.252  0.0882  0.918    1.00    5547.
+ 48 theta[48]  -0.838  -0.834  0.242 0.241 -1.25   -0.443    1.00    4463.
+ 49 theta[49]  -0.982  -0.981  0.251 0.246 -1.40   -0.581    1.00    3723.
+ 50 theta[50]   0.156   0.160  0.251 0.247 -0.257   0.572    1.00    5491.
+ 51 theta[51]  -0.983  -0.979  0.247 0.240 -1.40   -0.578    1.00    3752.
+ 52 theta[52]   0.316   0.316  0.251 0.253 -0.0926  0.730    1.00    5573.
+ 53 theta[53]  -0.980  -0.977  0.256 0.254 -1.40   -0.566    1.00    4192.
+ 54 theta[54]   1.21    1.21   0.259 0.261  0.783   1.64     1.00    3868.
+ 55 theta[55]  -0.980  -0.979  0.254 0.249 -1.40   -0.567    1.00    3677.
+ 56 theta[56]  -0.980  -0.976  0.249 0.248 -1.40   -0.578    1.00    4091.
+ 57 theta[57]  -0.735  -0.731  0.251 0.247 -1.15   -0.322    1.00    4310.
+ 58 theta[58]  -0.980  -0.978  0.250 0.248 -1.39   -0.573    1.00    4210.
+ 59 theta[59]  -0.0752 -0.0751 0.243 0.246 -0.479   0.331    1.00    4562.
+ 60 theta[60]  -0.647  -0.643  0.242 0.240 -1.05   -0.255    1.00    4092.
+ 61 theta[61]   1.38    1.37   0.260 0.263  0.955   1.81     1.00    3670.
+ 62 theta[62]   0.318   0.320  0.243 0.238 -0.0793  0.729    1.00    5113.
+ 63 theta[63]  -0.979  -0.978  0.247 0.248 -1.39   -0.573    1.00    4373.
+ 64 theta[64]   1.37    1.36   0.255 0.254  0.961   1.80     1.00    3946.
+ 65 theta[65]   1.20    1.20   0.248 0.245  0.804   1.62     1.00    4040.
+ 66 theta[66]  -0.754  -0.754  0.249 0.253 -1.16   -0.347    1.00    4548.
+ 67 theta[67]   0.539   0.537  0.249 0.251  0.128   0.956    1.00    5174.
+ 68 theta[68]   0.851   0.850  0.250 0.246  0.444   1.27     1.00    4489.
+ 69 theta[69]  -0.530  -0.530  0.252 0.249 -0.945  -0.115    1.00    4774.
+ 70 theta[70]   0.885   0.882  0.251 0.247  0.473   1.31     1.00    4849.
+ 71 theta[71]   0.0558  0.0570 0.243 0.243 -0.345   0.453    1.00    5378.
+ 72 theta[72]   1.04    1.04   0.258 0.261  0.623   1.47     1.00    4268.
+ 73 theta[73]  -0.0178 -0.0196 0.247 0.241 -0.419   0.395    1.00    5512.
+ 74 theta[74]  -0.979  -0.977  0.251 0.250 -1.39   -0.571    1.00    4231.
+ 75 theta[75]  -0.979  -0.981  0.254 0.258 -1.39   -0.565    1.00    4405.
+ 76 theta[76]   3.24    3.24   0.299 0.293  2.76    3.76     1.00    1839.
+ 77 theta[77]  -0.794  -0.794  0.252 0.247 -1.21   -0.378    1.00    3947.
+ 78 theta[78]   1.14    1.14   0.250 0.246  0.742   1.56     1.00    4008.
+ 79 theta[79]   1.86    1.86   0.274 0.273  1.42    2.32     1.00    3231.
+ 80 theta[80]   0.608   0.604  0.250 0.245  0.196   1.02     1.00    4659.
+ 81 theta[81]   0.0461  0.0456 0.245 0.244 -0.352   0.452    1.00    5404.
+ 82 theta[82]   0.0186  0.0162 0.249 0.253 -0.390   0.428    1.00    4973.
+ 83 theta[83]  -0.980  -0.975  0.251 0.249 -1.39   -0.573    1.00    4115.
+ 84 theta[84]   1.57    1.57   0.266 0.273  1.14    2.01     1.00    3701.
+ 85 theta[85]   0.206   0.204  0.248 0.246 -0.196   0.621    1.00    5842.
+ 86 theta[86]  -0.982  -0.978  0.247 0.242 -1.40   -0.581    1.00    4084.
+ 87 theta[87]   0.165   0.162  0.247 0.247 -0.244   0.574    1.00    5868.
+ 88 theta[88]  -0.319  -0.318  0.247 0.248 -0.732   0.0827   1.00    5772.
+ 89 theta[89]  -0.981  -0.974  0.249 0.247 -1.40   -0.578    1.00    3868.
+ 90 theta[90]   0.833   0.833  0.249 0.248  0.433   1.25     1.00    4588.
+ 91 theta[91]  -0.838  -0.832  0.251 0.255 -1.25   -0.430    1.00    4536.
+ 92 theta[92]   1.06    1.06   0.253 0.255  0.642   1.48     1.00    4692.
+ 93 theta[93]   0.0168  0.0140 0.251 0.249 -0.393   0.433    1.00    5666.
+ 94 theta[94]   2.58    2.58   0.285 0.285  2.13    3.06     1.00    2315.
+ 95 theta[95]   1.65    1.65   0.259 0.258  1.24    2.09     1.00    3350.
+ 96 theta[96]   0.317   0.318  0.246 0.250 -0.0874  0.720    1.00    4429.
+ 97 theta[97]   0.262   0.260  0.247 0.245 -0.134   0.665    1.00    5927.
+ 98 theta[98]  -0.982  -0.979  0.254 0.252 -1.40   -0.567    1.00    4066.
+ 99 theta[99]   1.21    1.20   0.249 0.247  0.806   1.62     1.00    3736.
+100 theta[100] -0.931  -0.926  0.248 0.244 -1.34   -0.533    1.00    4439.
+101 theta[101] -0.707  -0.706  0.245 0.243 -1.12   -0.303    1.00    3994.
+102 theta[102]  2.81    2.81   0.288 0.288  2.34    3.29     1.00    2096.
+103 theta[103] -0.669  -0.666  0.255 0.257 -1.09   -0.251    1.00    4065.
+104 theta[104]  0.854   0.848  0.263 0.262  0.423   1.29     1.00    4669.
+105 theta[105] -0.0884 -0.0870 0.251 0.250 -0.499   0.322    1.00    5462.
+106 theta[106]  1.12    1.12   0.256 0.256  0.709   1.55     1.00    4583.
+107 theta[107]  1.57    1.56   0.260 0.260  1.15    2.00     1.00    3379.
+108 theta[108]  0.834   0.828  0.251 0.258  0.433   1.25     1.00    4598.
+109 theta[109]  1.03    1.03   0.255 0.255  0.619   1.45     1.00    4562.
+110 theta[110]  0.0417  0.0406 0.246 0.246 -0.360   0.448    1.00    5277.
+111 theta[111]  0.112   0.112  0.245 0.244 -0.291   0.522    1.00    5637.
+112 theta[112] -0.641  -0.636  0.250 0.248 -1.06   -0.232    1.00    5001.
+113 theta[113]  0.370   0.363  0.246 0.249 -0.0296  0.775    1.00    5221.
+114 theta[114] -0.320  -0.324  0.245 0.245 -0.720   0.0852   1.00    4778.
+115 theta[115]  0.855   0.853  0.257 0.259  0.439   1.28     1.00    4557.
+116 theta[116] -0.173  -0.173  0.245 0.246 -0.580   0.228    1.00    5387.
+117 theta[117]  0.0605  0.0577 0.244 0.248 -0.342   0.460    1.00    5155.
+118 theta[118]  0.316   0.318  0.246 0.247 -0.0939  0.713    1.00    5385.
+119 theta[119] -0.838  -0.836  0.250 0.251 -1.26   -0.438    1.00    4460.
+120 theta[120] -0.980  -0.979  0.253 0.256 -1.40   -0.572    1.00    4108.
+121 theta[121]  0.201   0.203  0.253 0.253 -0.219   0.608    1.00    4782.
+122 theta[122] -0.642  -0.641  0.246 0.246 -1.04   -0.242    1.00    4503.
+123 theta[123]  1.21    1.20   0.254 0.256  0.802   1.64     1.00    3945.
+124 theta[124]  1.03    1.03   0.251 0.250  0.625   1.45     1.00    4298.
+125 theta[125] -0.981  -0.975  0.245 0.248 -1.39   -0.587    1.00    3647.
+126 theta[126] -0.642  -0.639  0.250 0.247 -1.05   -0.238    1.00    4406.
+127 theta[127]  1.12    1.12   0.257 0.254  0.711   1.56     1.00    4306.
+128 theta[128] -0.850  -0.848  0.251 0.251 -1.27   -0.435    1.00    4346.
+129 theta[129] -0.669  -0.668  0.251 0.248 -1.09   -0.261    1.00    4720.
+130 theta[130]  1.86    1.86   0.269 0.270  1.43    2.31     1.00    3018.
+131 theta[131] -0.344  -0.341  0.246 0.251 -0.744   0.0543   1.00    4973.
+132 theta[132]  1.65    1.65   0.265 0.265  1.22    2.09     1.00    3304.
+133 theta[133] -0.982  -0.979  0.248 0.251 -1.40   -0.584    1.00    4315.
+134 theta[134]  2.59    2.58   0.281 0.285  2.14    3.06     1.00    2168.
+135 theta[135] -0.794  -0.794  0.252 0.251 -1.21   -0.379    1.00    4153.
+136 theta[136] -0.980  -0.978  0.246 0.241 -1.38   -0.576    1.00    4247.
+137 theta[137]  0.774   0.770  0.255 0.255  0.358   1.20     1.00    5349.
+138 theta[138] -0.791  -0.792  0.248 0.249 -1.19   -0.383    1.00    4357.
+139 theta[139]  0.0411  0.0432 0.245 0.250 -0.359   0.442    1.00    5791.
+140 theta[140] -0.0575 -0.0591 0.244 0.247 -0.461   0.343    1.00    4311.
+141 theta[141] -0.842  -0.840  0.248 0.245 -1.26   -0.434    1.00    4107.
+142 theta[142] -0.978  -0.976  0.252 0.253 -1.39   -0.573    1.00    3674.
+143 theta[143] -0.979  -0.978  0.247 0.246 -1.38   -0.577    1.00    4143.
+144 theta[144]  0.811   0.809  0.250 0.251  0.410   1.23     1.00    4573.
+145 theta[145] -0.980  -0.981  0.251 0.242 -1.39   -0.568    1.00    4024.
+146 theta[146]  0.610   0.606  0.246 0.249  0.208   1.01     1.00    5099.
+147 theta[147]  0.852   0.852  0.253 0.252  0.437   1.27     1.00    5151.
+148 theta[148]  0.112   0.108  0.255 0.254 -0.302   0.539    1.00    5024.
+149 theta[149] -0.982  -0.979  0.250 0.249 -1.40   -0.576    1.00    4031.
+150 theta[150] -0.978  -0.974  0.246 0.247 -1.39   -0.579    1.00    4294.
+151 theta[151] -0.641  -0.637  0.254 0.255 -1.06   -0.227    1.00    5183.
+152 theta[152] -0.981  -0.980  0.249 0.252 -1.39   -0.577    1.00    4164.
+153 theta[153]  1.52    1.52   0.259 0.257  1.10    1.96     1.00    3673.
+154 theta[154] -0.931  -0.926  0.249 0.248 -1.34   -0.530    1.00    4235.
+155 theta[155] -0.981  -0.977  0.250 0.248 -1.39   -0.574    1.00    4307.
+156 theta[156] -0.838  -0.836  0.254 0.255 -1.25   -0.426    1.00    4504.
+157 theta[157] -0.836  -0.836  0.251 0.255 -1.25   -0.426    1.00    4324.
+158 theta[158] -0.0191 -0.0208 0.244 0.250 -0.423   0.380    1.00    5119.
+159 theta[159]  0.612   0.611  0.254 0.257  0.193   1.03     1.00    4876.
+160 theta[160] -0.982  -0.976  0.251 0.248 -1.40   -0.574    1.00    4076.
+161 theta[161]  1.29    1.29   0.251 0.250  0.880   1.71     1.00    3820.
+162 theta[162]  0.168   0.171  0.252 0.246 -0.254   0.577    1.00    5447.
+163 theta[163] -0.982  -0.980  0.252 0.249 -1.40   -0.572    1.00    4085.
+164 theta[164] -0.544  -0.541  0.253 0.254 -0.963  -0.128    1.00    5010.
+165 theta[165]  0.157   0.160  0.253 0.249 -0.262   0.573    1.00    5206.
+166 theta[166] -0.985  -0.979  0.253 0.251 -1.41   -0.583    1.00    3812.
+167 theta[167]  0.319   0.317  0.244 0.245 -0.0770  0.723    1.00    5024.
+168 theta[168]  1.37    1.37   0.256 0.258  0.957   1.80     1.00    3813.
+169 theta[169] -0.355  -0.355  0.246 0.249 -0.749   0.0526   1.00    4343.
+170 theta[170]  0.112   0.111  0.244 0.244 -0.283   0.507    1.00    5181.
+171 theta[171] -0.750  -0.748  0.248 0.244 -1.16   -0.340    1.00    4338.
+172 theta[172]  0.199   0.199  0.242 0.242 -0.197   0.596    1.00    5408.
+173 theta[173]  0.607   0.607  0.250 0.250  0.200   1.02     1.00    5023.
+174 theta[174] -0.711  -0.708  0.247 0.247 -1.12   -0.309    1.00    4031.
+175 theta[175] -0.669  -0.668  0.250 0.251 -1.08   -0.263    1.00    4523.
+176 theta[176] -0.791  -0.786  0.247 0.246 -1.20   -0.392    1.00    4259.
+177 theta[177] -0.437  -0.437  0.255 0.251 -0.859  -0.0222   1.00    5909.
+# ℹ 1 more variable: ess_tail &lt;dbl&gt;</code></pre>
 </div>
 </div>
 </section>
 <section id="eap-estimates-of-latent-variables" class="slide level2">
 <h2>EAP Estimates of Latent Variables</h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-17-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-18-1.png" width="960" class="r-stretch"></section>
 <section id="density-of-eap-estimates" class="slide level2">
 <h2>Density of EAP Estimates</h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-18-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-19-1.png" width="960" class="r-stretch"></section>
 <section id="density-of-all-posterior-draws" class="slide level2">
 <h2>Density of All Posterior Draws</h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-19-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-20-1.png" width="960" class="r-stretch"></section>
 <section id="comparing-two-posterior-distributions" class="slide level2">
 <h2>Comparing Two Posterior Distributions</h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-20-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-21-1.png" width="960" class="r-stretch"></section>
 <section id="comparing-eap-estimate-with-posterior-sd" class="slide level2">
 <h2>Comparing EAP Estimate with Posterior SD</h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-21-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-22-1.png" width="960" class="r-stretch"></section>
 <section id="comparing-eap-estimate-with-sum-score" class="slide level2">
 <h2>Comparing EAP Estimate with Sum Score</h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-22-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-23-1.png" width="960" class="r-stretch"></section>
 <section id="posterior-distribution-for-person-parameters" class="slide level2">
 <h2>Posterior Distribution for Person Parameters</h2>
 <p>The posterior distribution of the person parameters (the latent variable; for a single person): <span class="math display">\[
@@ -1110,11 +1145,11 @@ f\left(\theta_p \right)
 <p>Here:</p>
 <ul>
 <li><span class="math inline">\(f(\theta_p \mid \boldsymbol{Y})\)</span> is the posterior distribution of the latent variable conditional on the observed data</li>
-<li>$f( _p ) $ is the model (data) likelihood</li>
+<li><span class="math inline">\(f\left(\boldsymbol{Y} \mid \theta_p \right)\)</span> is the model (data) likelihood</li>
 </ul>
 <p><span class="math display">\[ f\left(\boldsymbol{Y} \mid \theta_p \right)  = \prod_{i=1}^I f(Y_i \mid \theta_p)\]</span></p>
 <ul>
-<li><span class="math inline">\(f(Y_i \mid \theta_p)\)</span> is the observed data likelihood: <span class="math inline">\(f(Y_i \mid \theta_p) ~ N(\mu_i + \lambda_i\theta_p, \psi_i)\)</span></li>
+<li><span class="math inline">\(f(Y_i \mid \theta_p)\)</span> is the observed data likelihood: <span class="math inline">\(f(Y_i \mid \theta_p) \sim N(\mu_i + \lambda_i\theta_p, \psi_i)\)</span></li>
 <li><span class="math inline">\(f\left(\theta_p \right) \sim N(0,1)\)</span> is the prior likelihood for the latent variable <span class="math inline">\(\theta_p\)</span></li>
 <li>Technical details: <a href="https://jonathantemplin.com/wp-content/uploads/2022/10/sem15pre906_lecture11.pdf">https://jonathantemplin.com/wp-content/uploads/2022/10/sem15pre906_lecture11.pdf</a></li>
 </ul>
@@ -1128,12 +1163,12 @@ f\left(\theta_p \right)
 <section id="recall-stans-parameters-block" class="slide level2">
 <h2>Recall: Stan’s <code>parameters {}</code> Block</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>parameters {</span>
-<span id="cb10-2"><a href=""></a>  vector[nObs] theta;                <span class="sc">/</span><span class="er">/</span> the latent <span class="fu">variables</span> (one <span class="cf">for</span> each person)</span>
-<span id="cb10-3"><a href=""></a>  vector[nItems] mu;                 <span class="sc">/</span><span class="er">/</span> the item <span class="fu">intercepts</span> (one <span class="cf">for</span> each item)</span>
-<span id="cb10-4"><a href=""></a>  vector[nItems] lambda;             <span class="sc">/</span><span class="er">/</span> the factor loadings<span class="sc">/</span>item <span class="fu">discriminations</span> (one <span class="cf">for</span> each item)</span>
-<span id="cb10-5"><a href=""></a>  vector<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span>[nItems] psi;       <span class="sc">/</span><span class="er">/</span> the unique standard <span class="fu">deviations</span> (one <span class="cf">for</span> each item)   </span>
-<span id="cb10-6"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>parameters {</span>
+<span id="cb11-2"><a href=""></a>  vector[nObs] theta;                <span class="sc">/</span><span class="er">/</span> the latent <span class="fu">variables</span> (one <span class="cf">for</span> each person)</span>
+<span id="cb11-3"><a href=""></a>  vector[nItems] mu;                 <span class="sc">/</span><span class="er">/</span> the item <span class="fu">intercepts</span> (one <span class="cf">for</span> each item)</span>
+<span id="cb11-4"><a href=""></a>  vector[nItems] lambda;             <span class="sc">/</span><span class="er">/</span> the factor loadings<span class="sc">/</span>item <span class="fu">discriminations</span> (one <span class="cf">for</span> each item)</span>
+<span id="cb11-5"><a href=""></a>  vector<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span>[nItems] psi;       <span class="sc">/</span><span class="er">/</span> the unique standard <span class="fu">deviations</span> (one <span class="cf">for</span> each item)   </span>
+<span id="cb11-6"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Here, the parameterization of <span class="math inline">\(\lambda\)</span> (factor loadings/discrimination parameters) can lead to problems in estimation</p>
 <ul>
@@ -1152,14 +1187,14 @@ f\left(\theta_p \right)
 <h2>New Samples Syntax</h2>
 <p>Trying the same model with a different random number seed:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>modelCFA_samplesFail <span class="ot">=</span> modelCFA_stan<span class="sc">$</span><span class="fu">sample</span>(</span>
-<span id="cb11-2"><a href=""></a>  <span class="at">data =</span> modelCFA_data,</span>
-<span id="cb11-3"><a href=""></a>  <span class="at">seed =</span> <span class="dv">25102022</span>,</span>
-<span id="cb11-4"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
-<span id="cb11-5"><a href=""></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
-<span id="cb11-6"><a href=""></a>  <span class="at">iter_warmup =</span> <span class="dv">2000</span>,</span>
-<span id="cb11-7"><a href=""></a>  <span class="at">iter_sampling =</span> <span class="dv">2000</span></span>
-<span id="cb11-8"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>modelCFA_samplesFail <span class="ot">=</span> modelCFA_stan<span class="sc">$</span><span class="fu">sample</span>(</span>
+<span id="cb12-2"><a href=""></a>  <span class="at">data =</span> modelCFA_data,</span>
+<span id="cb12-3"><a href=""></a>  <span class="at">seed =</span> <span class="dv">25102022</span>,</span>
+<span id="cb12-4"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb12-5"><a href=""></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
+<span id="cb12-6"><a href=""></a>  <span class="at">iter_warmup =</span> <span class="dv">2000</span>,</span>
+<span id="cb12-7"><a href=""></a>  <span class="at">iter_sampling =</span> <span class="dv">2000</span></span>
+<span id="cb12-8"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Convergence: FAIL</p>
 <div class="cell">
@@ -1212,11 +1247,11 @@ f\left(\theta_p \right)
 <section id="posterior-trace-plots-of-lambda" class="slide level2">
 <h2>Posterior Trace Plots of <span class="math inline">\(\lambda\)</span></h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-27-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-28-1.png" width="960" class="r-stretch"></section>
 <section id="posterior-density-plots-of-lambda" class="slide level2">
 <h2>Posterior Density Plots of <span class="math inline">\(\lambda\)</span></h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-28-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-29-1.png" width="960" class="r-stretch"></section>
 <section id="examining-latent-variables" class="slide level2">
 <h2>Examining Latent Variables</h2>
 <div class="cell">
@@ -1241,11 +1276,11 @@ f\left(\theta_p \right)
 <section id="posterior-trace-plots-of-theta" class="slide level2">
 <h2>Posterior Trace Plots of <span class="math inline">\(\theta\)</span></h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-30-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-31-1.png" width="960" class="r-stretch"></section>
 <section id="posterior-density-plots-of-theta" class="slide level2">
 <h2>Posterior Density Plots of <span class="math inline">\(\theta\)</span></h2>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-31-1.png" width="960" class="r-stretch"></section>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-32-1.png" width="960" class="r-stretch"></section>
 <section id="fixing-convergence" class="slide level2">
 <h2>Fixing Convergence</h2>
 <p>Stan allows starting values to be set via <code>cmdstanr</code></p>
@@ -1265,12 +1300,12 @@ f\left(\theta_p \right)
 </ul></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>parameters {</span>
-<span id="cb15-2"><a href=""></a>  vector[nObs] theta;                <span class="sc">/</span><span class="er">/</span> the latent <span class="fu">variables</span> (one <span class="cf">for</span> each person)</span>
-<span id="cb15-3"><a href=""></a>  vector[nItems] mu;                 <span class="sc">/</span><span class="er">/</span> the item <span class="fu">intercepts</span> (one <span class="cf">for</span> each item)</span>
-<span id="cb15-4"><a href=""></a>  vector<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span>[nItems] lambda;             <span class="sc">/</span><span class="er">/</span> the factor loadings<span class="sc">/</span>item <span class="fu">discriminations</span> (one <span class="cf">for</span> each item)</span>
-<span id="cb15-5"><a href=""></a>  vector<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span>[nItems] psi;       <span class="sc">/</span><span class="er">/</span> the unique standard <span class="fu">deviations</span> (one <span class="cf">for</span> each item)   </span>
-<span id="cb15-6"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a>parameters {</span>
+<span id="cb16-2"><a href=""></a>  vector[nObs] theta;                <span class="sc">/</span><span class="er">/</span> the latent <span class="fu">variables</span> (one <span class="cf">for</span> each person)</span>
+<span id="cb16-3"><a href=""></a>  vector[nItems] mu;                 <span class="sc">/</span><span class="er">/</span> the item <span class="fu">intercepts</span> (one <span class="cf">for</span> each item)</span>
+<span id="cb16-4"><a href=""></a>  vector<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span>[nItems] lambda;             <span class="sc">/</span><span class="er">/</span> the factor loadings<span class="sc">/</span>item <span class="fu">discriminations</span> (one <span class="cf">for</span> each item)</span>
+<span id="cb16-5"><a href=""></a>  vector<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span>[nItems] psi;       <span class="sc">/</span><span class="er">/</span> the unique standard <span class="fu">deviations</span> (one <span class="cf">for</span> each item)   </span>
+<span id="cb16-6"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="setting-starting-values-in-stan" class="slide level2">
@@ -1294,16 +1329,16 @@ f\left(\theta_p \right)
 <h2>cmdstanr Syntax for Initial Values</h2>
 <p>Add the init option to the $sample() function of the <code>cmdstanr</code> object:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a><span class="co"># set starting values for some of the parameters</span></span>
-<span id="cb16-2"><a href=""></a>modelCFA_samples2fixed <span class="ot">=</span> modelCFA_stan<span class="sc">$</span><span class="fu">sample</span>(</span>
-<span id="cb16-3"><a href=""></a>  <span class="at">data =</span> modelCFA_data,</span>
-<span id="cb16-4"><a href=""></a>  <span class="at">seed =</span> <span class="dv">25102022</span>,</span>
-<span id="cb16-5"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
-<span id="cb16-6"><a href=""></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
-<span id="cb16-7"><a href=""></a>  <span class="at">iter_warmup =</span> <span class="dv">2000</span>,</span>
-<span id="cb16-8"><a href=""></a>  <span class="at">iter_sampling =</span> <span class="dv">2000</span>, </span>
-<span id="cb16-9"><a href=""></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">lambda=</span><span class="fu">rnorm</span>(nItems, <span class="at">mean=</span><span class="dv">10</span>, <span class="at">sd=</span><span class="dv">2</span>))</span>
-<span id="cb16-10"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a><span class="co"># set starting values for some of the parameters</span></span>
+<span id="cb17-2"><a href=""></a>modelCFA_samples2fixed <span class="ot">=</span> modelCFA_stan<span class="sc">$</span><span class="fu">sample</span>(</span>
+<span id="cb17-3"><a href=""></a>  <span class="at">data =</span> modelCFA_data,</span>
+<span id="cb17-4"><a href=""></a>  <span class="at">seed =</span> <span class="dv">25102022</span>,</span>
+<span id="cb17-5"><a href=""></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb17-6"><a href=""></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
+<span id="cb17-7"><a href=""></a>  <span class="at">iter_warmup =</span> <span class="dv">2000</span>,</span>
+<span id="cb17-8"><a href=""></a>  <span class="at">iter_sampling =</span> <span class="dv">2000</span>, </span>
+<span id="cb17-9"><a href=""></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">lambda=</span><span class="fu">rnorm</span>(nItems, <span class="at">mean=</span><span class="dv">10</span>, <span class="at">sd=</span><span class="dv">2</span>))</span>
+<span id="cb17-10"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The init option can be specified as a function, here, randomly starting each <span class="math inline">\(\lambda\)</span> following a normal distribution</p>
 </section>
@@ -1315,42 +1350,42 @@ f\left(\theta_p \right)
 <h2>Final Results: Parameters</h2>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.006028</code></pre>
+<pre><code>[1] 1.00472</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 30 × 10
    variable    mean median     sd    mad    q5   q95  rhat ess_bulk ess_tail
    &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
- 1 mu[1]      2.37   2.37  0.0866 0.0848 2.23  2.51   1.00    1126.    2140.
- 2 mu[2]      1.95   1.95  0.0858 0.0855 1.82  2.10   1.00     834.    1671.
- 3 mu[3]      1.87   1.87  0.0843 0.0832 1.74  2.01   1.00     945.    1919.
- 4 mu[4]      2.01   2.01  0.0848 0.0853 1.87  2.15   1.00     905.    1957.
- 5 mu[5]      1.98   1.98  0.0849 0.0837 1.85  2.12   1.01     667.    1424.
- 6 mu[6]      1.89   1.89  0.0775 0.0754 1.77  2.02   1.01     663.    1312.
- 7 mu[7]      1.72   1.72  0.0769 0.0762 1.60  1.85   1.00     865.    1567.
- 8 mu[8]      1.84   1.84  0.0740 0.0720 1.72  1.96   1.01     664.    1355.
- 9 mu[9]      1.81   1.81  0.0873 0.0865 1.66  1.95   1.00     843.    1769.
-10 mu[10]     1.52   1.52  0.0802 0.0788 1.39  1.65   1.00    1179.    2697.
-11 lambda[1]  0.739  0.737 0.0826 0.0820 0.606 0.878  1.00    3067.    4467.
-12 lambda[2]  0.870  0.869 0.0773 0.0776 0.745 0.999  1.00    2126.    3216.
-13 lambda[3]  0.803  0.801 0.0769 0.0769 0.680 0.933  1.00    2515.    4205.
-14 lambda[4]  0.844  0.843 0.0771 0.0766 0.719 0.972  1.00    2192.    3562.
-15 lambda[5]  0.997  0.995 0.0710 0.0702 0.884 1.12   1.00    1471.    2884.
-16 lambda[6]  0.899  0.897 0.0645 0.0643 0.798 1.01   1.00    1325.    2700.
-17 lambda[7]  0.764  0.763 0.0699 0.0701 0.653 0.880  1.00    1959.    3704.
-18 lambda[8]  0.854  0.851 0.0619 0.0619 0.756 0.959  1.00    1417.    2881.
-19 lambda[9]  0.861  0.858 0.0794 0.0798 0.737 0.998  1.00    2062.    3667.
-20 lambda[10] 0.673  0.671 0.0777 0.0767 0.548 0.805  1.00    2906.    3929.
-21 psi[1]     0.892  0.889 0.0496 0.0489 0.814 0.977  1.00   12735.    6249.
-22 psi[2]     0.735  0.733 0.0428 0.0433 0.669 0.807  1.00   12024.    6824.
-23 psi[3]     0.781  0.780 0.0459 0.0457 0.708 0.859  1.00   12240.    6149.
-24 psi[4]     0.758  0.756 0.0443 0.0445 0.688 0.833  1.00   12364.    6171.
-25 psi[5]     0.545  0.544 0.0370 0.0364 0.486 0.608  1.00    7710.    6597.
-26 psi[6]     0.505  0.503 0.0340 0.0333 0.452 0.564  1.00    8278.    6590.
-27 psi[7]     0.686  0.683 0.0403 0.0396 0.623 0.755  1.00   12596.    6270.
-28 psi[8]     0.480  0.479 0.0319 0.0310 0.429 0.534  1.00    8420.    6669.
-29 psi[9]     0.782  0.780 0.0455 0.0449 0.710 0.860  1.00   12865.    6131.
-30 psi[10]    0.840  0.838 0.0474 0.0473 0.765 0.920  1.00   15265.    6184.</code></pre>
+ 1 mu[1]      2.37   2.36  0.0878 0.0863 2.22  2.51   1.00    1086.    2547.
+ 2 mu[2]      1.95   1.95  0.0857 0.0845 1.81  2.10   1.00     725.    1588.
+ 3 mu[3]      1.87   1.87  0.0862 0.0870 1.73  2.02   1.00     854.    1829.
+ 4 mu[4]      2.01   2.01  0.0868 0.0866 1.87  2.16   1.00     777.    1397.
+ 5 mu[5]      1.98   1.98  0.0874 0.0857 1.84  2.13   1.00     585.     980.
+ 6 mu[6]      1.89   1.89  0.0793 0.0788 1.76  2.02   1.00     609.    1139.
+ 7 mu[7]      1.72   1.72  0.0782 0.0761 1.59  1.85   1.00     770.    1520.
+ 8 mu[8]      1.84   1.84  0.0750 0.0755 1.72  1.96   1.00     580.    1062.
+ 9 mu[9]      1.81   1.81  0.0884 0.0874 1.66  1.95   1.00     796.    1728.
+10 mu[10]     1.52   1.52  0.0825 0.0824 1.38  1.66   1.00    1122.    2205.
+11 lambda[1]  0.737  0.734 0.0827 0.0811 0.605 0.876  1.00    3302.    4406.
+12 lambda[2]  0.870  0.866 0.0767 0.0776 0.750 1.00   1.00    2181.    3811.
+13 lambda[3]  0.802  0.799 0.0768 0.0775 0.679 0.930  1.00    2580.    4391.
+14 lambda[4]  0.843  0.841 0.0767 0.0758 0.720 0.971  1.00    2282.    4093.
+15 lambda[5]  0.997  0.994 0.0691 0.0696 0.887 1.12   1.00    1446.    2984.
+16 lambda[6]  0.899  0.896 0.0636 0.0644 0.800 1.01   1.00    1464.    3098.
+17 lambda[7]  0.765  0.763 0.0695 0.0680 0.654 0.883  1.00    2313.    3779.
+18 lambda[8]  0.853  0.851 0.0609 0.0616 0.757 0.955  1.00    1547.    3327.
+19 lambda[9]  0.861  0.858 0.0796 0.0777 0.734 0.995  1.00    2331.    4095.
+20 lambda[10] 0.672  0.670 0.0771 0.0763 0.549 0.804  1.00    3427.    5018.
+21 psi[1]     0.892  0.890 0.0503 0.0502 0.812 0.980  1.00   13357.    5746.
+22 psi[2]     0.735  0.733 0.0437 0.0434 0.666 0.811  1.00   11126.    6092.
+23 psi[3]     0.781  0.780 0.0452 0.0451 0.710 0.859  1.00   13015.    6448.
+24 psi[4]     0.758  0.756 0.0441 0.0439 0.689 0.833  1.00   12527.    6555.
+25 psi[5]     0.545  0.544 0.0368 0.0373 0.487 0.607  1.00    8108.    6781.
+26 psi[6]     0.505  0.504 0.0341 0.0342 0.451 0.562  1.00    8063.    6345.
+27 psi[7]     0.686  0.684 0.0396 0.0394 0.623 0.753  1.00   12978.    6088.
+28 psi[8]     0.480  0.479 0.0314 0.0310 0.430 0.533  1.00    8821.    6431.
+29 psi[9]     0.782  0.780 0.0462 0.0455 0.711 0.862  1.00   10379.    6070.
+30 psi[10]    0.840  0.838 0.0467 0.0457 0.767 0.920  1.00   13767.    5702.</code></pre>
 </div>
 </div>
 </section>
@@ -1358,10 +1393,10 @@ f\left(\theta_p \right)
 <h2>Comparing Results</h2>
 <p>Plot of all parameters across both algorithm runs:</p>
 
-<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-35-1.png" width="960" class="r-stretch"><p>Correlation of all parameters across both algorithm runs:</p>
+<img data-src="04b_Modeling_Observed_Data_files/figure-revealjs/unnamed-chunk-36-1.png" width="960" class="r-stretch"><p>Correlation of all parameters across both algorithm runs:</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9486459</code></pre>
+<pre><code>[1] 0.9999964</code></pre>
 </div>
 </div>
 </section>

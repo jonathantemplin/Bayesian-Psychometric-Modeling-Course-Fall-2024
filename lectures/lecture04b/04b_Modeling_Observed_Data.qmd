@@ -255,43 +255,6 @@ There are a few changes needed to make Stan estimate psychometric models with no
 * The parameters will be specified as vectors of each type
   * Each item will have its own set of parameters
   * Implications for the use of prior distributions
-  
-## Stan's ```data {}``` Block
-
-```{r, eval=FALSE, echo=TRUE}
-data {
-  int<lower=0> nObs;                 // number of observations
-  int<lower=0> nItems;               // number of items
-  matrix[nObs, nItems] Y;            // item responses in a matrix
-
-  vector[nItems] meanMu;
-  matrix[nItems, nItems] covMu;      // prior covariance matrix for coefficients
-  
-  vector[nItems] meanLambda;         // prior mean vector for coefficients
-  matrix[nItems, nItems] covLambda;  // prior covariance matrix for coefficients
-  
-  vector[nItems] psiRate;            // prior rate parameter for unique standard deviations
-}
-```
-
-## Stan's ```parameters {}``` Block
-
-```{r, eval=FALSE, echo=TRUE}
-parameters {
-  vector[nObs] theta;                // the latent variables (one for each person)
-  vector[nItems] mu;                 // the item intercepts (one for each item)
-  vector[nItems] lambda;             // the factor loadings/item discriminations (one for each item)
-  vector<lower=0>[nItems] psi;       // the unique standard deviations (one for each item)   
-}
-```
-
-Here, the parameterization of $\lambda$ (factor loadings/discrimination parameters) can lead to problems in estimation
-
-* The issue: $\lambda_i \theta_p = (-\lambda_i)(-\theta_p)$
-  * Depending on the random starting values of each of these parameters (per chain), a given chain may converge to a different region
-* To demonstrate (later), we will start with a different random number seed
-  * Currently using 09102022: works fine
-  * Change to 25102022: big problems
 
 ## Stan's ```model``` Block
 
@@ -318,6 +281,46 @@ The loop here conducts the model, separately, for each item
 * The item mean is set by the conditional mean of the model
   * The item SD is set by the unique variance parameter
 * The loop puts each item's parameters into the equation
+
+## Stan's ```parameters {}``` Block
+
+```{r, eval=FALSE, echo=TRUE}
+parameters {
+  vector[nObs] theta;                // the latent variables (one for each person)
+  vector[nItems] mu;                 // the item intercepts (one for each item)
+  vector[nItems] lambda;             // the factor loadings/item discriminations (one for each item)
+  vector<lower=0>[nItems] psi;       // the unique standard deviations (one for each item)   
+}
+```
+
+Here, the parameterization of $\lambda$ (factor loadings/discrimination parameters) can lead to problems in estimation
+
+* The issue: $\lambda_i \theta_p = (-\lambda_i)(-\theta_p)$
+  * Depending on the random starting values of each of these parameters (per chain), a given chain may converge to a different region
+* To demonstrate (later), we will start with a different random number seed
+  * Currently using 09102022: works fine
+  * Change to 25102022: big problems
+* Our fix will be to set starting values for all $\lambda_i$ and $\theta_p$
+
+## Stan's ```data {}``` Block
+
+```{r, eval=FALSE, echo=TRUE}
+data {
+  int<lower=0> nObs;                 // number of observations
+  int<lower=0> nItems;               // number of items
+  matrix[nObs, nItems] Y;            // item responses in a matrix
+
+  vector[nItems] meanMu;
+  matrix[nItems, nItems] covMu;      // prior covariance matrix for coefficients
+  
+  vector[nItems] meanLambda;         // prior mean vector for coefficients
+  matrix[nItems, nItems] covLambda;  // prior covariance matrix for coefficients
+  
+  vector[nItems] psiRate;            // prior rate parameter for unique standard deviations
+}
+```
+
+
 
 ## Choosing Prior Distributions for Parameters
 
@@ -377,6 +380,8 @@ modelCFA_data = list(
 )
 ```
 
+
+
 ## Running the Model In Stan
 
 The Stan program takes longer to run than in linear models:
@@ -384,12 +389,6 @@ The Stan program takes longer to run than in linear models:
 * Number of parameters = 207
   * 10 observed variables (with three item parameters each: $\mu_i$, $\lambda_i$, and $\psi_i$)
   * 177 latent variables (one for each person: 177 parameters)
-
-* Key syntax block is the observed variable definition:
-
-```{r, eval=FALSE, echo=TRUE}
-Y[,item] ~ normal(mu[item] + lambda[item]*theta, psi[item]);
-```
 
 * cmdstanr samples call:
 
@@ -399,13 +398,46 @@ modelCFA_samples = modelCFA_stan$sample(
   seed = 09102022,
   chains = 4,
   parallel_chains = 4,
-  iter_warmup = 1000,
-  iter_sampling = 2000
+  iter_warmup = 2000,
+  iter_sampling = 2000,
+  init = function() list(lambda=rnorm(nItems, mean=10, sd=2),
+                         theta=rnorm(nObs, mean=initTheta, sd=0))
 )
 ```
 
 * Note: Typically, longer chains are needed for larger models like this
   * These will become even longer when we use non-normal distributions for observed data
+
+## Stan's ```init``` Option
+
+
+```{r, eval = FALSE, echo=TRUE}
+  init = function() list(lambda=rnorm(nItems, mean=10, sd=2),
+                         theta=rnorm(nObs, mean=initTheta, sd=0))
+```
+
+* The ```init``` option is used to set starting values for the parameters
+  * This is especially important for the item discrimination parameters $\lambda_i$ and the latent variables $\theta_p$
+* This code tells Stan to sample starting values for $\lambda_i$ from a normal distribution with mean 10 and standard deviation 2
+  * This ensures starting values for $\lambda_i$ will most likely be positive
+* For $\theta_p$, we will need more work...
+
+## Initializing Latent Variables
+
+* As we expect the latent variable to be highly related to the sum score, we can use the sum score to help us initialize $\theta_p$ so we end up in the correct mode of the posterior distribution
+
+* We will use the standardized sum score as a starting value for $\theta_p$ (starting value denoted $\theta_p^*$)
+
+$$\theta_{p}^* = \frac{\sum_{i=1}^I Y_{pi} - \text{mean}\left({\sum_{i=1}^I Y_{pi}}\right)}{\text{sd}\left({\sum_{i=1}^I Y_{pi}}\right)}$$
+
+```{r, eval=FALSE, echo=TRUE}
+# create standardized sum scores for latent variable initialization values
+sumScores = rowSums(conspiracyItems)
+initTheta = (sumScores - mean(sumScores))/sd(sumScores)
+```
+
+* We will use the standardized sum score as the starting value for $\theta_p$ in the ```init``` option
+  * In my example, I set the standard deviation of the normal distribution to zero (meaning the function just returns the mean) -- you can also choose to make this a small value allowing for some variability
 
 ## Model Results
 
@@ -666,11 +698,11 @@ $$
 Here:
 
 * $f(\theta_p \mid \boldsymbol{Y})$ is the posterior distribution of the latent variable conditional on the observed data
-* $f\left(\boldsymbol{Y} \mid \theta_p \right) $ is the model (data) likelihood
+* $f\left(\boldsymbol{Y} \mid \theta_p \right)$ is the model (data) likelihood
 
 $$ f\left(\boldsymbol{Y} \mid \theta_p \right)  = \prod_{i=1}^I f(Y_i \mid \theta_p)$$
 
-* $f(Y_i \mid \theta_p)$ is the observed data likelihood: $f(Y_i \mid \theta_p) ~ N(\mu_i + \lambda_i\theta_p, \psi_i)$
+* $f(Y_i \mid \theta_p)$ is the observed data likelihood: $f(Y_i \mid \theta_p) \sim N(\mu_i + \lambda_i\theta_p, \psi_i)$
 * $f\left(\theta_p \right) \sim N(0,1)$ is the prior likelihood for the latent variable $\theta_p$
 * Technical details: [https://jonathantemplin.com/wp-content/uploads/2022/10/sem15pre906_lecture11.pdf](https://jonathantemplin.com/wp-content/uploads/2022/10/sem15pre906_lecture11.pdf)
 
