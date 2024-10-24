@@ -13,7 +13,7 @@ editor: source
 
 
 ```{r, include=FALSE}
-if (length(grep(pattern = "lecture04b.RData", x = dir()))  == 0){
+if (length(grep(pattern = "lecture04c.RData", x = dir()))  == 0){
   system("Rscript 04c_Modeling_Observed_Dichotomous_Data.R")
 }
 
@@ -232,6 +232,7 @@ We can finally define a latent variable model for binary responses using a Berno
 For an item $i$ and a person $p$, the model becomes:
 
 $$logit \left( P\left( Y_{pi}=1\right) \right) = \mu_i +\lambda_i\theta_p$$
+
 * Note: the mean $\pi_i$ is replaced by $P\left(Y_{pi} = 1 |\theta_p \right)$
   * This is the mean of the observed variable, conditional on $\theta_p$
 * The item intercept is $\mu_i$: The expected logit when $\theta_p = 0$
