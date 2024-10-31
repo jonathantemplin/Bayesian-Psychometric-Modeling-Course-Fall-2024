@@ -1613,18 +1613,20 @@ logit \left(Y_{p10} = 1 \right) = \mu_{10} + \lambda_{10} \theta_p  \\
 <span id="cb25-8"><a href=""></a>}</span>
 <span id="cb25-9"><a href=""></a></span>
 <span id="cb25-10"><a href=""></a>parameters {</span>
-<span id="cb25-11"><a href=""></a>  vector[nObs] theta;                <span class="sc">/</span><span class="er">/</span> the latent <span class="fu">variables</span> (one <span class="cf">for</span> each person)</span>
-<span id="cb25-12"><a href=""></a>  vector[nItems] b;             <span class="sc">/</span><span class="er">/</span> the factor loadings<span class="sc">/</span>item <span class="fu">discriminations</span> (one <span class="cf">for</span> each item)</span>
-<span id="cb25-13"><a href=""></a>}</span>
-<span id="cb25-14"><a href=""></a></span>
-<span id="cb25-15"><a href=""></a>model {</span>
-<span id="cb25-16"><a href=""></a>  b <span class="sc">~</span> <span class="fu">multi_normal</span>(meanB, covB);             <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> item intercepts</span>
-<span id="cb25-17"><a href=""></a>  theta <span class="sc">~</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>);                         <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> latent <span class="fu">variable</span> (with mean<span class="sc">/</span>sd specified)</span>
-<span id="cb25-18"><a href=""></a>  </span>
-<span id="cb25-19"><a href=""></a>  <span class="cf">for</span> (item <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nItems){</span>
-<span id="cb25-20"><a href=""></a>    Y[item] <span class="sc">~</span> <span class="fu">bernoulli</span>(<span class="fu">inv_logit</span>(theta <span class="sc">-</span> b[item]));</span>
-<span id="cb25-21"><a href=""></a>  }</span>
-<span id="cb25-22"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-11"><a href=""></a>  vector[nObs] theta;               <span class="sc">/</span><span class="er">/</span> the latent <span class="fu">variables</span> (one <span class="cf">for</span> each person)</span>
+<span id="cb25-12"><a href=""></a>  vector[nItems] b;                 <span class="sc">/</span><span class="er">/</span> the factor loadings<span class="sc">/</span>item <span class="fu">discriminations</span> (one <span class="cf">for</span> each item)</span>
+<span id="cb25-13"><a href=""></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> sdTheta;            <span class="sc">/</span><span class="er">/</span> standard deviation <span class="cf">for</span> latent variable</span>
+<span id="cb25-14"><a href=""></a>}</span>
+<span id="cb25-15"><a href=""></a></span>
+<span id="cb25-16"><a href=""></a>model {</span>
+<span id="cb25-17"><a href=""></a>  b <span class="sc">~</span> <span class="fu">multi_normal</span>(meanB, covB);             <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> item intercepts</span>
+<span id="cb25-18"><a href=""></a>  theta <span class="sc">~</span> <span class="fu">normal</span>(<span class="dv">0</span>, sdTheta);                <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> latent <span class="fu">variable</span> (with mean specified<span class="sc">/</span>sd estimated)</span>
+<span id="cb25-19"><a href=""></a>  sdTheta <span class="sc">~</span> <span class="fu">exponential</span>(.<span class="dv">1</span>);                 <span class="sc">/</span><span class="er">/</span> Prior <span class="cf">for</span> latent variable standard deviation</span>
+<span id="cb25-20"><a href=""></a>  </span>
+<span id="cb25-21"><a href=""></a>  <span class="cf">for</span> (item <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nItems){</span>
+<span id="cb25-22"><a href=""></a>    Y[item] <span class="sc">~</span> <span class="fu">bernoulli</span>(<span class="fu">inv_logit</span>(theta <span class="sc">-</span> b[item]));</span>
+<span id="cb25-23"><a href=""></a>  }</span>
+<span id="cb25-24"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="pl-model-1" class="slide level2">

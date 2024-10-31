@@ -1224,13 +1224,15 @@ data {
 }
 
 parameters {
-  vector[nObs] theta;                // the latent variables (one for each person)
-  vector[nItems] b;             // the factor loadings/item discriminations (one for each item)
+  vector[nObs] theta;               // the latent variables (one for each person)
+  vector[nItems] b;                 // the factor loadings/item discriminations (one for each item)
+  real<lower=0> sdTheta;            // standard deviation for latent variable
 }
 
 model {
   b ~ multi_normal(meanB, covB);             // Prior for item intercepts
-  theta ~ normal(0, 1);                         // Prior for latent variable (with mean/sd specified)
+  theta ~ normal(0, sdTheta);                // Prior for latent variable (with mean specified/sd estimated)
+  sdTheta ~ exponential(.1);                 // Prior for latent variable standard deviation
   
   for (item in 1:nItems){
     Y[item] ~ bernoulli(inv_logit(theta - b[item]));
