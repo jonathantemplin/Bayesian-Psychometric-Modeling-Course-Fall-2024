@@ -1,15 +1,15 @@
 ---
-title: 'Homework #3'
-author: "Bayesian Psychometric Modeling (PSQF 7375, Fall 2022)"
-date: "Due Friday, November 18th, 2022 at 11:59pm in ICON"
-output: html_document
+title: 'Homework #4'
+author: "Bayesian Psychometric Modeling (PSQF 7375, Fall 2024)"
+date: "Due Friday, November 15th, 2022 at 11:59pm in ICON"
+output: word_document
 ---
 
 ## Bayesian Psychometric Models
 
 The objectives of this homework are:
 
-1. To learn how to estimate a polytomous item repsonse models with MCMC
+1. To learn how to estimate a polytomous item response model with MCMC
 2. To see how each type of observed data assumption impacts the latent variable estimates
 3. To see the impact of different prior distributions on all model parameters
 
@@ -45,7 +45,7 @@ The data file is available for download at [https://jonathantemplin.com/wp-conte
 The variables in the data are:
 
 * ID: The ID number of the person
-* grii-gri24: The response to a 6-point Likert item for each person
+* gri1-gri24: The response to a 6-point Likert item for each person
 
 The purpose of this homework is for you to practice polytomous item response models (the graded response model), including writing the syntax for the model, as well as finding and and interpreting the relevant pieces of output. The graded response model assumes each observed item follows a conditional multinomial (categorical) distribution with a logistic link function and a proportional odds assumption and each factor follows a normal distribution.
 
