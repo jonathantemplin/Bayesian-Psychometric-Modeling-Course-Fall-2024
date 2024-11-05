@@ -194,7 +194,7 @@ The binomial distribution is one of the easiest to use for polytomous items
 
 Binomial probability mass function (i.e., pdf):
 
-$$P(Y = y) = {n \choose y} p^k \left(1-p \right)^{(n-k)}  $$
+$$P(Y = y) = {n \choose y} p^y \left(1-p \right)^{(n-y)}  $$
 
 Parameters:
 
@@ -204,7 +204,7 @@ Parameters:
 
 Mean: $np$ 
 
-Variance: $np(1-p$)
+Variance: $np(1-p)$
 
 ## Adapting the Binomial for Item Response Models
 
@@ -217,7 +217,7 @@ Although it doesn't seem like our items fit with a binomial, we can actually use
 * Then, use a link function to model each item's $p_i$ as a function of the latent trait:
   
 
-$$p_i = \frac{\exp\left(\mu_i + \lambda_i \theta_p)\right)}{1+\exp\left(\mu_i + \lambda_i \theta_p)\right)}$$
+$$p_i = \frac{\exp\left(\mu_i + \lambda_i \theta_p\right)}{1+\exp\left(\mu_i + \lambda_i \theta_p \right)}$$
 
 Note:
 
@@ -229,7 +229,7 @@ Note:
 
 The item response model, put into the PDF of the binomial is then:
 
-$$P(Y_{pi}  \mid \theta_p) = {n_i \choose Y_{pi}} \left(\frac{\exp\left(\mu_i + \lambda_i \theta_p)\right)}{1+\exp\left(\mu_i + \lambda_i \theta_p)\right)}\right)^{Y_{pi}} \left(1-\left(\frac{\exp\left(\mu_i + \lambda_i \theta_p)\right)}{1+\exp\left(\mu_i + \lambda_i \theta_p)\right)}\right) \right)^{(n_i-Y_{pi})}  $$
+$$P(Y_{pi}  \mid \theta_p) = {n_i \choose Y_{pi}} \left(\frac{\exp\left(\mu_i + \lambda_i \theta_p \right)}{1+\exp\left(\mu_i + \lambda_i \theta_p \right)}\right)^{Y_{pi}} \left(1-\left(\frac{\exp\left(\mu_i + \lambda_i \theta_p \right)}{1+\exp\left(\mu_i + \lambda_i \theta_p \right)}\right) \right)^{(n_i-Y_{pi})}  $$
 
 Further, we can use the same priors as before on each of our item parameters
 
@@ -531,22 +531,21 @@ The most-frequently used polytomous item response models all use the categorical
 
 ## Graded Response Model
 
-The graded response model is an ordered logistic regression model where:
+For an item $Y_{i,c_i}$ with ordered categories for response options $c_i \in \left\{1, \ldots, C_i\right\}$, the graded response model is an ordered logistic regression model where:
 
-$$P\left(Y_{ic } \mid \theta \right) = \left\{ 
-\begin{array}{lr}
-1-P^*\left(Y_{i1} \mid \theta \right) & \text{if } c=1 \\
-P^*\left(Y_{i{c-1}} \mid \theta \right) - P^*\left(Y_{i{c}} \mid \theta \right) & \text{if } 1<c<C_i \\
-P^*\left(Y_{i{C_i -1} } \mid \theta \right) & \text{if } c=C_i \\
-\end{array} \right.$$
+$$P\left(Y_{i{c_i}} = c_i \mid \theta \right) = 
+P^*\left(Y_{i{c_i} } \geq c_i-1 \mid \theta \right) - P^*\left(Y_{i{c_i}} \geq c_i \mid \theta \right) 
+$$
 
 Where:
 
-$$P^*\left(Y_{i{c}} \mid \theta \right)  = \frac{\exp(\mu_{ic}+\lambda_i\theta_p)}{1+\exp(\mu_{ic}+\lambda_i\theta_p)}$$
+$$P^*\left(Y_{i{c}} \geq c_i \mid \theta \right)  = \frac{\exp(\mu_{ic}+\lambda_i\theta_p)}{1+\exp(\mu_{ic}+\lambda_i\theta_p)}$$
 
 With:
 
 * $C_i-1$ Ordered intercepts: $\mu_1 > \mu_2 > \ldots > \mu_{C_i-1}$
+* $P^*\left(Y_{i1} \geq 1 \mid \theta \right) = 1$
+* $P^*\left(Y_{ic_i} \geq C_i+1 \mid \theta \right) = 0$
 
 ## Estimating the Graded Response Model in Stan
 
@@ -568,7 +567,7 @@ model {
 Notes:
 
 * ```ordered_logistic``` is a built in Stan function that makes the model easy to implement
-  * Instead of intercepts, however, it uses thresholds: $\tau_{ic} = -\mu_{ic} $
+  * Instead of intercepts, however, it uses thresholds: $\tau_{ic} = -\mu_{ic}$
   * First argument is the linear predictor (the non-intercept portion of the model)
   * Second argument is the set of thresholds for the item
 

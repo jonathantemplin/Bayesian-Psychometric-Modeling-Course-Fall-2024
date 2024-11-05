@@ -534,7 +534,7 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <li>However, it assumes the distribution of responses are unimodal</li>
 </ul>
 <p>Binomial probability mass function (i.e., pdf):</p>
-<p><span class="math display">\[P(Y = y) = {n \choose y} p^k \left(1-p \right)^{(n-k)}  \]</span></p>
+<p><span class="math display">\[P(Y = y) = {n \choose y} p^y \left(1-p \right)^{(n-y)}  \]</span></p>
 <p>Parameters:</p>
 <ul>
 <li><span class="math inline">\(n\)</span> – “number of trials” (range: <span class="math inline">\(n \in \{0, 1, \ldots\}\)</span>)</li>
@@ -542,7 +542,7 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <li><span class="math inline">\(p\)</span> – probability of “success” (range: <span class="math inline">\([0, 1]\)</span>)</li>
 </ul>
 <p>Mean: <span class="math inline">\(np\)</span></p>
-<p>Variance: <span class="math inline">\(np(1-p\)</span>)</p>
+<p>Variance: <span class="math inline">\(np(1-p)\)</span></p>
 </section>
 <section id="adapting-the-binomial-for-item-response-models" class="slide level2">
 <h2>Adapting the Binomial for Item Response Models</h2>
@@ -558,7 +558,7 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 </ul></li>
 <li>Then, use a link function to model each item’s <span class="math inline">\(p_i\)</span> as a function of the latent trait:</li>
 </ul>
-<p><span class="math display">\[p_i = \frac{\exp\left(\mu_i + \lambda_i \theta_p)\right)}{1+\exp\left(\mu_i + \lambda_i \theta_p)\right)}\]</span></p>
+<p><span class="math display">\[p_i = \frac{\exp\left(\mu_i + \lambda_i \theta_p\right)}{1+\exp\left(\mu_i + \lambda_i \theta_p \right)}\]</span></p>
 <p>Note:</p>
 <ul>
 <li>Shown with a logit link function (but could be any link)</li>
@@ -569,7 +569,7 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <section id="binomial-item-repsonse-model" class="slide level2">
 <h2>Binomial Item Repsonse Model</h2>
 <p>The item response model, put into the PDF of the binomial is then:</p>
-<p><span class="math display">\[P(Y_{pi}  \mid \theta_p) = {n_i \choose Y_{pi}} \left(\frac{\exp\left(\mu_i + \lambda_i \theta_p)\right)}{1+\exp\left(\mu_i + \lambda_i \theta_p)\right)}\right)^{Y_{pi}} \left(1-\left(\frac{\exp\left(\mu_i + \lambda_i \theta_p)\right)}{1+\exp\left(\mu_i + \lambda_i \theta_p)\right)}\right) \right)^{(n_i-Y_{pi})}  \]</span></p>
+<p><span class="math display">\[P(Y_{pi}  \mid \theta_p) = {n_i \choose Y_{pi}} \left(\frac{\exp\left(\mu_i + \lambda_i \theta_p \right)}{1+\exp\left(\mu_i + \lambda_i \theta_p \right)}\right)^{Y_{pi}} \left(1-\left(\frac{\exp\left(\mu_i + \lambda_i \theta_p \right)}{1+\exp\left(\mu_i + \lambda_i \theta_p \right)}\right) \right)^{(n_i-Y_{pi})}  \]</span></p>
 <p>Further, we can use the same priors as before on each of our item parameters</p>
 <ul>
 <li><span class="math inline">\(\mu_i\)</span>: Normal prior <span class="math inline">\(N(0, 1000)\)</span></li>
@@ -688,7 +688,7 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="co"># checking convergence</span></span>
 <span id="cb8-2"><a href=""></a><span class="fu">max</span>(modelBinomial_samples<span class="sc">$</span><span class="fu">summary</span>()<span class="sc">$</span>rhat, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.001265</code></pre>
+<pre><code>[1] 1.002976</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="co"># item parameter results</span></span>
 <span id="cb10-2"><a href=""></a><span class="fu">print</span>(modelBinomial_samples<span class="sc">$</span><span class="fu">summary</span>(<span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"lambda"</span>)) ,<span class="at">n=</span><span class="cn">Inf</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -696,26 +696,26 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 <pre><code># A tibble: 20 × 10
    variable     mean median    sd   mad     q5    q95  rhat ess_bulk ess_tail
    &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
- 1 mu[1]      -0.840 -0.837 0.128 0.129 -1.05  -0.635  1.00    2409.    6027.
- 2 mu[2]      -1.83  -1.82  0.216 0.212 -2.21  -1.49   1.00    2201.    4827.
- 3 mu[3]      -1.99  -1.98  0.224 0.222 -2.38  -1.64   1.00    2193.    4891.
- 4 mu[4]      -1.73  -1.72  0.210 0.210 -2.09  -1.40   1.00    2121.    4648.
- 5 mu[5]      -2.00  -1.99  0.251 0.250 -2.43  -1.61   1.00    2102.    5043.
- 6 mu[6]      -2.10  -2.09  0.246 0.243 -2.52  -1.71   1.00    2131.    5035.
- 7 mu[7]      -2.44  -2.43  0.267 0.265 -2.90  -2.03   1.00    2471.    5576.
- 8 mu[8]      -2.16  -2.15  0.246 0.242 -2.58  -1.78   1.00    2122.    4475.
- 9 mu[9]      -2.40  -2.39  0.281 0.279 -2.89  -1.97   1.00    2307.    5761.
-10 mu[10]     -3.97  -3.93  0.519 0.508 -4.89  -3.19   1.00    3188.    6378.
-11 lambda[1]   1.11   1.11  0.147 0.147  0.884  1.37   1.00    4667.    7114.
-12 lambda[2]   1.91   1.89  0.245 0.242  1.53   2.33   1.00    4071.    6885.
-13 lambda[3]   1.92   1.91  0.257 0.252  1.53   2.37   1.00    4209.    4632.
-14 lambda[4]   1.89   1.88  0.240 0.234  1.53   2.31   1.00    3599.    4405.
-15 lambda[5]   2.28   2.26  0.285 0.277  1.85   2.78   1.00    3795.    5398.
-16 lambda[6]   2.16   2.14  0.275 0.270  1.73   2.63   1.00    4022.    5340.
-17 lambda[7]   2.14   2.12  0.299 0.294  1.68   2.66   1.00    3770.    5467.
-18 lambda[8]   2.09   2.07  0.276 0.268  1.67   2.57   1.00    3952.    5307.
-19 lambda[9]   2.36   2.34  0.319 0.319  1.87   2.90   1.00    3950.    5219.
-20 lambda[10]  3.41   3.37  0.563 0.549  2.56   4.40   1.00    4459.    5240.</code></pre>
+ 1 mu[1]      -0.843 -0.841 0.127 0.126 -1.06  -0.640  1.00    2810.    7189.
+ 2 mu[2]      -1.84  -1.83  0.215 0.212 -2.20  -1.50   1.00    2471.    6004.
+ 3 mu[3]      -2.00  -1.99  0.224 0.222 -2.38  -1.65   1.00    2582.    6063.
+ 4 mu[4]      -1.73  -1.72  0.208 0.206 -2.09  -1.40   1.00    2364.    5046.
+ 5 mu[5]      -2.00  -1.99  0.251 0.248 -2.43  -1.61   1.00    2437.    5398.
+ 6 mu[6]      -2.10  -2.09  0.245 0.244 -2.52  -1.72   1.00    2459.    5679.
+ 7 mu[7]      -2.44  -2.43  0.265 0.262 -2.91  -2.04   1.00    2769.    6669.
+ 8 mu[8]      -2.16  -2.15  0.241 0.241 -2.57  -1.78   1.00    2419.    6171.
+ 9 mu[9]      -2.40  -2.39  0.280 0.276 -2.89  -1.97   1.00    2705.    6829.
+10 mu[10]     -3.98  -3.94  0.522 0.504 -4.91  -3.20   1.00    3369.    6516.
+11 lambda[1]   1.11   1.11  0.148 0.146  0.884  1.37   1.00    5282.    8924.
+12 lambda[2]   1.91   1.89  0.243 0.240  1.53   2.33   1.00    4346.    7607.
+13 lambda[3]   1.93   1.91  0.258 0.254  1.54   2.38   1.00    4071.    6938.
+14 lambda[4]   1.90   1.89  0.235 0.234  1.53   2.31   1.00    3895.    7366.
+15 lambda[5]   2.29   2.27  0.287 0.284  1.84   2.78   1.00    3687.    6487.
+16 lambda[6]   2.16   2.14  0.275 0.275  1.73   2.64   1.00    3770.    6818.
+17 lambda[7]   2.14   2.12  0.299 0.294  1.68   2.66   1.00    4269.    7491.
+18 lambda[8]   2.09   2.07  0.273 0.269  1.67   2.56   1.00    3935.    7073.
+19 lambda[9]   2.35   2.33  0.318 0.311  1.87   2.91   1.00    4061.    6669.
+20 lambda[10]  3.43   3.38  0.565 0.550  2.58   4.43   1.00    4189.    6370.</code></pre>
 </div>
 </div>
 </section>
@@ -812,18 +812,17 @@ Y_{pi} = \mu_i + \lambda_i \theta_p  + e_{p,i}; &amp; e_{p,i} \sim N\left(0, \ps
 </section>
 <section id="graded-response-model" class="slide level2">
 <h2>Graded Response Model</h2>
-<p>The graded response model is an ordered logistic regression model where:</p>
-<p><span class="math display">\[P\left(Y_{ic } \mid \theta \right) = \left\{
-\begin{array}{lr}
-1-P^*\left(Y_{i1} \mid \theta \right) &amp; \text{if } c=1 \\
-P^*\left(Y_{i{c-1}} \mid \theta \right) - P^*\left(Y_{i{c}} \mid \theta \right) &amp; \text{if } 1&lt;c&lt;C_i \\
-P^*\left(Y_{i{C_i -1} } \mid \theta \right) &amp; \text{if } c=C_i \\
-\end{array} \right.\]</span></p>
+<p>For an item <span class="math inline">\(Y_{i,c_i}\)</span> with ordered categories for response options <span class="math inline">\(c_i \in \left\{1, \ldots, C_i\right\}\)</span>, the graded response model is an ordered logistic regression model where:</p>
+<p><span class="math display">\[P\left(Y_{i{c_i}} = c_i \mid \theta \right) =
+P^*\left(Y_{i{c_i} } \geq c_i-1 \mid \theta \right) - P^*\left(Y_{i{c_i}} \geq c_i \mid \theta \right)
+\]</span></p>
 <p>Where:</p>
-<p><span class="math display">\[P^*\left(Y_{i{c}} \mid \theta \right)  = \frac{\exp(\mu_{ic}+\lambda_i\theta_p)}{1+\exp(\mu_{ic}+\lambda_i\theta_p)}\]</span></p>
+<p><span class="math display">\[P^*\left(Y_{i{c}} \geq c_i \mid \theta \right)  = \frac{\exp(\mu_{ic}+\lambda_i\theta_p)}{1+\exp(\mu_{ic}+\lambda_i\theta_p)}\]</span></p>
 <p>With:</p>
 <ul>
 <li><span class="math inline">\(C_i-1\)</span> Ordered intercepts: <span class="math inline">\(\mu_1 &gt; \mu_2 &gt; \ldots &gt; \mu_{C_i-1}\)</span></li>
+<li><span class="math inline">\(P^*\left(Y_{i1} \geq 1 \mid \theta \right) = 1\)</span></li>
+<li><span class="math inline">\(P^*\left(Y_{ic_i} \geq C_i+1 \mid \theta \right) = 0\)</span></li>
 </ul>
 </section>
 <section id="estimating-the-graded-response-model-in-stan" class="slide level2">
@@ -845,7 +844,7 @@ P^*\left(Y_{i{C_i -1} } \mid \theta \right) &amp; \text{if } c=C_i \\
 <ul>
 <li><code>ordered_logistic</code> is a built in Stan function that makes the model easy to implement
 <ul>
-<li>Instead of intercepts, however, it uses thresholds: $<em>{ic} = -</em>{ic} $</li>
+<li>Instead of intercepts, however, it uses thresholds: <span class="math inline">\(\tau_{ic} = -\mu_{ic}\)</span></li>
 <li>First argument is the linear predictor (the non-intercept portion of the model)</li>
 <li>Second argument is the set of thresholds for the item</li>
 </ul></li>
