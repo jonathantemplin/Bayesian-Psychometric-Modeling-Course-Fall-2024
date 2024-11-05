@@ -4,7 +4,7 @@ author: "Lecture 4d"
 format: 
   revealjs:
     multiplex: false
-    footer: "[https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2022/](https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2022/)"
+    footer: "[https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/](https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/)"
     theme: ["pp.scss"]
     slide-number: c/t
     incremental: false
