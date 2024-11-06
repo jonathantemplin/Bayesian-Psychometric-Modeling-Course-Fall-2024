@@ -1,8 +1,8 @@
 ---
 title: 'Homework #4'
 author: "Bayesian Psychometric Modeling (PSQF 7375, Fall 2024)"
-date: "Due Friday, November 15th, 2022 at 11:59pm in ICON"
-output: word_document
+date: "Due Friday, November 15th, 2024 at 11:59pm in ICON"
+output: html_document
 ---
 
 ## Bayesian Psychometric Models
@@ -15,7 +15,7 @@ The objectives of this homework are:
 
 ### General Instructions:
 
-The data for homework 3 were collected at a casino from a sample of persons who were gambling. The content and response options for 24 items measuring pathological gambling are given in the excel file GRI_Items.xlsx, along with the item responses in the excel file GRI_Data.xlsx. Use Stan for all models in this assignment. 
+The data for homework 4 were collected at a casino from a sample of persons who were gambling. The content and response options for 24 items measuring pathological gambling are given in the excel file GRI_Items.xlsx, along with the item responses in the excel file GRI_Data.xlsx. Use Stan for all models in this assignment. 
 
 #### For all questions below, when estimates are requested, report:
 

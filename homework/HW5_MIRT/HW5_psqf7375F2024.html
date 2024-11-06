@@ -12,7 +12,7 @@
 <meta name="author" content="Bayesian Psychometric Modeling (PSQF 7375, Fall 2024)" />
 
 
-<title>Homework #4</title>
+<title>Homework #5</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -349,10 +349,10 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Homework #4</h1>
+<h1 class="title toc-ignore">Homework #5</h1>
 <h4 class="author">Bayesian Psychometric Modeling (PSQF 7375, Fall
 2024)</h4>
-<h4 class="date">Due Friday, November 15th, 2024 at 11:59pm in ICON</h4>
+<h4 class="date">Due Friday, December 6th, 2024 at 11:59pm in ICON</h4>
 
 </div>
 
@@ -361,20 +361,22 @@ display: none;
 <h2>Bayesian Psychometric Models</h2>
 <p>The objectives of this homework are:</p>
 <ol style="list-style-type: decimal">
-<li>To learn how to estimate a polytomous item response model with
-MCMC</li>
+<li>To learn how to estimate a multidimensional polytomous item response
+model with MCMC</li>
 <li>To see how each type of observed data assumption impacts the latent
 variable estimates</li>
-<li>To see the impact of different prior distributions on all model
-parameters</li>
+<li>To learn how to assess absolute and relative model fit</li>
 </ol>
 <div id="general-instructions" class="section level3">
 <h3>General Instructions:</h3>
-<p>The data for homework 3 were collected at a casino from a sample of
+<p>The data for homework 5 were collected at a casino from a sample of
 persons who were gambling. The content and response options for 24 items
 measuring pathological gambling are given in the excel file
 GRI_Items.xlsx, along with the item responses in the excel file
 GRI_Data.xlsx. Use Stan for all models in this assignment.</p>
+<p>Also in the GRI_Items.xlsx file are two columns that provide the
+entries for the Q-matrix to use (titled Financial and Non-Financial).
+Please use this Q-matrix in your multidimensional analysis.</p>
 <div id="for-all-questions-below-when-estimates-are-requested-report" class="section level4">
 <h4>For all questions below, when estimates are requested, report:</h4>
 <ul>
@@ -416,19 +418,31 @@ The list of items are available at <a href="https://jonathantemplin.com/wp-conte
 <li>gri1-gri24: The response to a 6-point Likert item for each
 person</li>
 </ul>
-<p>The purpose of this homework is for you to practice polytomous item
-response models (the graded response model), including writing the
-syntax for the model, as well as finding and and interpreting the
-relevant pieces of output. The graded response model assumes each
-observed item follows a conditional multinomial (categorical)
-distribution with a logistic link function and a proportional odds
-assumption and each factor follows a normal distribution.</p>
-<p>Using Stan, estimate a single-factor graded response model for all
-items. Use the z-score method of identification, in which the factor
-mean is fixed to 0, the factor variance is fixed to 1, and all item
-parameters are estimated.</p>
+<p>The purpose of this homework is for you to practice multidimensional
+polytomous item response models (the graded response model), including
+writing the syntax for the model, as well as finding and and
+interpreting the relevant pieces of output. The graded response model
+assumes each observed item follows a conditional multinomial
+(categorical) distribution with a logistic link function and a
+proportional odds assumption and each factor follows a normal
+distribution.</p>
+<p>Model 1: Using Stan, estimate a single-factor graded response model
+for all items. Use the z-score method of identification, in which the
+factor mean is fixed to 0, the factor variance is fixed to 1, and all
+item parameters are estimated.</p>
+<p>Model 2: Using Stan, estimate a two-factor graded response model for
+all items using the Q-matrix in GRI_Items.xlsx. Use the z-score method
+of identification, in which the factor mean is fixed to 0, the factor
+variance is fixed to 1, and all item parameters are estimated.</p>
 <p>Use Stan’s default prior distributions for each model parameter that
 is not a factor score.</p>
+<p>Finally, include syntax within Stan to assess absolute and relative
+model fit for each model. For absolute fit, use the posterior predictive
+p-value (ppp) for Pearson correlations. For relative fit, use the Widely
+Applicable Information Criterion (WAIC) and LOO-PSIS (Leave One
+Out-Pareto Smoothed Importance Sampling).</p>
+<p>Answer the following questions for Model 2 (Model 1 was a previous
+homework):</p>
 <p><strong>1. What is the model for each observed item response (i.e.,
 the linear predictor, the link function, the submodels, the
 distribution, and any other parameters) </strong></p>
@@ -446,26 +460,22 @@ for what to report)</p>
 <p><strong>5. What are your estimates for the factor scores?</strong>
 (see estimate details above for what to report)</p>
 <p><strong>My Answer</strong></p>
-<p><strong>6. Provide a scatter plot of the EAP estimates of latent
-variables (<span class="math inline">\(\theta_p\)</span>) from the
-analysis from section 1 (x-axis) and the analysis from section 3
-(y-axis)$</strong></p>
+<p><strong>6. What are your estimates for the factor
+correlation?</strong> (see estimate details above for what to
+report)</p>
 <p><strong>My Answer</strong></p>
-<p><strong>7. In which ways do the results for the latent variables when
-using the CFA assumptions versus the GRM assumptions?</strong></p>
+<p>*<strong>7. What are your estimates for the factor variance?</strong>
+(see estimate details above for what to report)</p>
 <p><strong>My Answer</strong></p>
-<p><strong>8. What would you predict would happen to the latent
-variables if you were to use an empirical prior (as in section
-2)?</strong></p>
+<p><strong>8. Which items had posterior predictive p-values for their
+Pearson correlations that were less than 0.05 or greater than
+0.95?</strong></p>
 <p><strong>My Answer</strong></p>
-<p><strong>9. Provide a scatter plot of the EAP estimates of the latent
-variables (<span class="math inline">\(\theta_p\)</span>) from the
-analysis of section 3 (x-axis) and the posterior standard deviation
-estimates of the latent variables from the analysis of section 3
-(y-axis)</strong></p>
+<p><strong>9. What are the WAIC and LOO-PSIS values for this
+model?</strong></p>
 <p><strong>My Answer</strong></p>
-<p><strong>10. Where (i.e., for what range of EAP estimates) is the
-estimation of the latent variables most precise?</strong></p>
+<p><strong>10. Which model (model 1 or 2) is preferred based on WAIC and
+LOO-PSIS?</strong></p>
 <p><strong>My Answer</strong></p>
 </div>
 </div>
