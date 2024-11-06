@@ -4,7 +4,7 @@ author: "Lecture 4e"
 format: 
   revealjs:
     multiplex: false
-    footer: "[https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2022/](https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2022/)"
+    footer: "[https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/](https://jonathantemplin.com/bayesian-psychometric-modeling-fall-2024/)"
     theme: ["pp.scss"]
     slide-number: c/t
     incremental: false
@@ -15,12 +15,10 @@ editor: source
 ```{r, include=FALSE}
 
 if (length(grep(pattern = "lecture04e.RData", x = dir()))  == 0){
-  system("Rscript 04e_Modeling_Multidimensional_Latent_Variables.R")
+  system("Rscript lecture04e.RData")
 }
 
 load("lecture04e.RData")
-
-
 
 needed_packages = c("ggplot2", "cmdstanr", "HDInterval", "bayesplot", "loo")
 for(i in 1:length(needed_packages)){
