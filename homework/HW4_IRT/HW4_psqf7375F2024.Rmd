@@ -15,7 +15,7 @@ The objectives of this homework are:
 
 ### General Instructions:
 
-The data for homework 4 were collected at a casino from a sample of persons who were gambling. The content and response options for 24 items measuring pathological gambling are given in the excel file GRI_Items.xlsx, along with the item responses in the excel file GRI_Data.xlsx. Use Stan for all models in this assignment. 
+The data for homework 3 were collected at a casino from a sample of persons who were gambling. The content and response options for 24 items measuring pathological gambling are given in the excel file GRI_Items.xlsx, along with the item responses in the excel file GRI_Data.xlsx. Use Stan for all models in this assignment. 
 
 #### For all questions below, when estimates are requested, report:
 
@@ -73,19 +73,11 @@ Use Stan's default prior distributions for each model parameter that is not a fa
 
 **My Answer**
 
-**6. Provide a scatter plot of the EAP estimates of latent variables ($\theta_p$) from the analysis from section 1 (x-axis) and the analysis from section 3 (y-axis)$**
+**6. What would you predict would happen to the latent variables if you were to use an empirical prior (as in section 2)?** 
 
 **My Answer**
 
-**7. In which ways do the results for the latent variables when using the CFA assumptions versus the GRM assumptions?** 
-
-**My Answer**
-
-**8. What would you predict would happen to the latent variables if you were to use an empirical prior (as in section 2)?** 
-
-**My Answer**
-
-**9. Provide a scatter plot of the EAP estimates of the latent variables ($\theta_p$) from the analysis of section 3 (x-axis) and the posterior standard deviation estimates of the latent variables from the analysis of section 3 (y-axis)** 
+**9. Provide a scatter plot of the EAP estimates of the latent variables ($\theta_p$) (x-axis) and the posterior standard deviation estimates of the latent variables (y-axis)** 
 
 **My Answer**
 
