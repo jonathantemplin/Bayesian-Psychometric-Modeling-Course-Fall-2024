@@ -2,7 +2,7 @@
 title: 'Homework #4'
 author: "Bayesian Psychometric Modeling (PSQF 7375, Fall 2024)"
 date: "Due Friday, November 15th, 2024 at 11:59pm in ICON"
-output: html_document
+output: word_document
 ---
 
 ## Bayesian Psychometric Models
@@ -73,15 +73,11 @@ Use Stan's default prior distributions for each model parameter that is not a fa
 
 **My Answer**
 
-**6. What would you predict would happen to the latent variables if you were to use an empirical prior (as in section 2)?** 
+**6. Provide a scatter plot of the EAP estimates of the latent variables ($\theta_p$) (x-axis) and the posterior standard deviation estimates of the latent variables (y-axis)** 
 
 **My Answer**
 
-**9. Provide a scatter plot of the EAP estimates of the latent variables ($\theta_p$) (x-axis) and the posterior standard deviation estimates of the latent variables (y-axis)** 
-
-**My Answer**
-
-**10. Where (i.e., for what range of EAP estimates) is the estimation of the latent variables most precise?** 
+**7. Where (i.e., for what range of EAP estimates) is the estimation of the latent variables most precise?** 
 
 **My Answer**
 

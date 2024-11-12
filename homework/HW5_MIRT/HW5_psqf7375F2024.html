@@ -432,10 +432,17 @@ factor mean is fixed to 0, the factor variance is fixed to 1, and all
 item parameters are estimated.</p>
 <p>Model 2: Using Stan, estimate a two-factor graded response model for
 all items using the Q-matrix in GRI_Items.xlsx. Use the z-score method
-of identification, in which the factor mean is fixed to 0, the factor
-variance is fixed to 1, and all item parameters are estimated.</p>
-<p>Use Stan’s default prior distributions for each model parameter that
-is not a factor score.</p>
+of identification, in which each factor mean is fixed to 0, each factor
+variance is fixed to 1, and all factor correlations are estimated.</p>
+<p>Model 3: Using Stan, reestimate model 2 but with empirical priors on
+the factor loadings and on the item intercept parameters. Use the
+z-score method of identification, in which each factor mean is fixed to
+0, each factor variance is fixed to 1, and all factor correlations are
+estimated.</p>
+<p>Model 4: Using Stan, reestimate model 2 but with marker items where
+the first factor loadings for each dimension is set to one. For scale
+identification, set each factor mean to 0, but estimate each factor
+variance and all factor correlations.</p>
 <p>Finally, include syntax within Stan to assess absolute and relative
 model fit for each model. For absolute fit, use the posterior predictive
 p-value (ppp) for Pearson correlations. For relative fit, use the Widely
@@ -476,6 +483,83 @@ model?</strong></p>
 <p><strong>My Answer</strong></p>
 <p><strong>10. Which model (model 1 or 2) is preferred based on WAIC and
 LOO-PSIS?</strong></p>
+<p><strong>My Answer</strong></p>
+<!-- Here, make a set of questions for model 3  -->
+<p>Answer the following questions for Model 3:</p>
+<p><strong>11. Did your Markov chains converge? What evidence do you
+have to support your answer?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>12. What are your estimates for each item intercept
+parameter?</strong> (see estimate details above for what to report)</p>
+<p><strong>My Answer</strong></p>
+<p><strong>13. What are your estimates for each factor
+loading/discrimination parameter</strong> (see estimate details above
+for what to report)</p>
+<p><strong>My Answer</strong></p>
+<p><strong>14. What are your estimates for the factor scores?</strong>
+(see estimate details above for what to report)</p>
+<p><strong>My Answer</strong></p>
+<p><strong>15. What are your estimates for the factor
+correlation?</strong> (see estimate details above for what to
+report)</p>
+<p><strong>My Answer</strong></p>
+<p><strong>16. Which items had posterior predictive p-values for their
+Pearson correlations that were less than 0.05 or greater than
+0.95?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>17. What are the WAIC and LOO-PSIS values for this
+model?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>18. Which model (model 2 or 3) is preferred based on WAIC and
+LOO-PSIS?</strong></p>
+<p><strong>My Answer</strong></p>
+<!-- Now make a set of questions comparing model 3 to model 2 -->
+<p><strong>19. Create a scatterplot of the factor scores for the model 3
+compared to model 2. What do you observe?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>20. Create a scatterplot of the factor loadings for model 3
+compared to model 2. What do you observe?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>21. Create a scatter plot of the item intercepts for model 3
+compared to model 2. What do you observe?</strong></p>
+<p><strong>My Answer</strong></p>
+<!-- Now make a set of questions for model 4 -->
+<p>Answer the following questions for Model 4:</p>
+<p><strong>22. Did your Markov chains converge? What evidence do you
+have to support your answer?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>23. What are your estimates for each item intercept
+parameter?</strong> (see estimate details above for what to report)</p>
+<p><strong>My Answer</strong></p>
+<p><strong>24. What are your estimates for each factor
+loading/discrimination parameter</strong> (see estimate details above
+for what to report)</p>
+<p><strong>My Answer</strong></p>
+<p><strong>25. What are your estimates for the factor scores?</strong>
+(see estimate details above for what to report)</p>
+<p><strong>My Answer</strong></p>
+<p><strong>26. What are your estimates for the factor
+correlation?</strong> (see estimate details above for what to
+report)</p>
+<p><strong>My Answer</strong></p>
+<p><strong>27. Which items had posterior predictive p-values for their
+Pearson correlations that were less than 0.05 or greater than
+0.95?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>28. What are the WAIC and LOO-PSIS values for this
+model?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>29. Which model (model 2, 3, or 4) is preferred based on WAIC
+and LOO-PSIS?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>30. Create a scatterplot of the factor scores for the model 4
+compared to model 2. What do you observe?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>31. Create a scatterplot of the factor loadings for model 4
+compared to model 2. What do you observe?</strong></p>
+<p><strong>My Answer</strong></p>
+<p><strong>32. Create a scatter plot of the item intercepts for model 4
+compared to model 2. What do you observe?</strong></p>
 <p><strong>My Answer</strong></p>
 </div>
 </div>

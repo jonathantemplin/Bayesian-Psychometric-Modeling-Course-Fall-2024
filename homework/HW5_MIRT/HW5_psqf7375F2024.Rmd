@@ -2,7 +2,7 @@
 title: 'Homework #5'
 author: "Bayesian Psychometric Modeling (PSQF 7375, Fall 2024)"
 date: "Due Friday, December 6th, 2024 at 11:59pm in ICON"
-output: word_document
+output: html_document
 ---
 
 ## Bayesian Psychometric Models
@@ -53,9 +53,11 @@ The purpose of this homework is for you to practice multidimensional polytomous 
 
 Model 1: Using Stan, estimate a single-factor graded response model for all items. Use the z-score method of identification, in which the factor mean is fixed to 0, the factor variance is fixed to 1, and all item parameters are estimated. 
 
-Model 2: Using Stan, estimate a two-factor graded response model for all items using the Q-matrix in GRI_Items.xlsx. Use the z-score method of identification, in which the factor mean is fixed to 0, the factor variance is fixed to 1, and all item parameters are estimated. 
+Model 2: Using Stan, estimate a two-factor graded response model for all items using the Q-matrix in GRI_Items.xlsx. Use the z-score method of identification, in which each factor mean is fixed to 0, each factor variance is fixed to 1, and all factor correlations are estimated.
 
-Use Stan's default prior distributions for each model parameter that is not a factor score.
+Model 3: Using Stan, reestimate model 2 but with empirical priors on the factor loadings and on the item intercept parameters. Use the z-score method of identification, in which each factor mean is fixed to 0, each factor variance is fixed to 1, and all factor correlations are estimated.
+
+Model 4: Using Stan, reestimate model 2 but with marker items where the first factor loadings for each dimension is set to one. For scale identification, set each factor mean to 0, but estimate each factor variance and all factor correlations.
 
 Finally, include syntax within Stan to assess absolute and relative model fit for each model. For absolute fit, use the posterior predictive p-value (ppp) for Pearson correlations. For relative fit, use the Widely Applicable Information Criterion (WAIC) and LOO-PSIS (Leave One Out-Pareto Smoothed Importance Sampling).
 
@@ -100,3 +102,106 @@ Answer the following questions for Model 2 (Model 1 was a previous homework):
 **10. Which model (model 1 or 2) is preferred based on WAIC and LOO-PSIS?**
 
 **My Answer**
+
+<!-- Here, make a set of questions for model 3  -->
+
+Answer the following questions for Model 3:
+
+**11. Did your Markov chains converge? What evidence do you have to support your answer?**
+
+**My Answer**
+
+**12. What are your estimates for each item intercept parameter?** (see estimate details above for what to report)
+
+**My Answer**
+
+**13. What are your estimates for each factor loading/discrimination parameter** (see estimate details above for what to report)
+
+**My Answer**
+
+**14. What are your estimates for the factor scores?** (see estimate details above for what to report)
+
+**My Answer**
+
+**15. What are your estimates for the factor correlation?** (see estimate details above for what to report)
+
+**My Answer**
+
+**16. Which items had posterior predictive p-values for their Pearson correlations that were less than 0.05 or greater than 0.95?**
+
+**My Answer**
+
+**17. What are the WAIC and LOO-PSIS values for this model?**
+
+**My Answer**
+
+**18. Which model (model 2 or 3) is preferred based on WAIC and LOO-PSIS?**
+
+**My Answer**
+
+<!-- Now make a set of questions comparing model 3 to model 2 -->
+
+**19. Create a scatterplot of the factor scores for the model 3 compared to model 2. What do you observe?**
+
+**My Answer**
+
+**20. Create a scatterplot of the factor loadings for model 3 compared to model 2. What do you observe?**
+
+**My Answer**
+
+**21. Create a scatter plot of the item intercepts for model 3 compared to model 2. What do you observe?**
+
+**My Answer**
+
+<!-- Now make a set of questions for model 4 -->
+
+Answer the following questions for Model 4:
+
+**22. Did your Markov chains converge? What evidence do you have to support your answer?**
+
+**My Answer**
+
+**23. What are your estimates for each item intercept parameter?** (see estimate details above for what to report)
+
+**My Answer**
+
+**24. What are your estimates for each factor loading/discrimination parameter** (see estimate details above for what to report)
+
+**My Answer**
+
+**25. What are your estimates for the factor scores?** (see estimate details above for what to report)
+
+**My Answer**
+
+**26. What are your estimates for the factor correlation?** (see estimate details above for what to report)
+
+**My Answer**
+
+**27. Which items had posterior predictive p-values for their Pearson correlations that were less than 0.05 or greater than 0.95?**
+
+**My Answer**
+
+**28. What are the WAIC and LOO-PSIS values for this model?**
+
+**My Answer**
+
+**29. Which model (model 2, 3, or 4) is preferred based on WAIC and LOO-PSIS?**
+
+**My Answer**
+
+**30. Create a scatterplot of the factor scores for the model 4 compared to model 2. What do you observe?**
+
+**My Answer**
+
+**31. Create a scatterplot of the factor loadings for model 4 compared to model 2. What do you observe?**
+
+**My Answer**
+
+**32. Create a scatter plot of the item intercepts for model 4 compared to model 2. What do you observe?**
+
+**My Answer** 
+
+
+
+
+
